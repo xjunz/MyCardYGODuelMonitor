@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Copyrighted" pattern="file[萌卡观战提醒.app]:src/main/res/*||file[萌卡观战提醒.app]:src/main/java/*||file[萌卡观战提醒.app]:src/main/java//*||file[萌卡观战提醒.app]:src/main/res//*||file[萌卡观战提醒.app]:src/main/AndroidManifest.xml" />
+</component>
