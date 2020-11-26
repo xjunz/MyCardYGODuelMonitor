@@ -1,0 +1,27 @@
+<!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">?colorBackgroundFloating</item>
+        <item name="colorAccent">@color/teal_200</item>
+        <item name="android:statusBarColor">?colorPrimary</item>
+        <item name="android:colorEdgeEffect">?colorAccent</item>
+        <item name="colorControlHighlight">@color/semi_teal_200</item>
+    </style>
+
+    <style name="Theme.Base">
+        <item name="android:navigationBarColor">?colorPrimaryDark</item>
+    </style>
+
+    <style name="Theme.Base.Translucent">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+</resources>

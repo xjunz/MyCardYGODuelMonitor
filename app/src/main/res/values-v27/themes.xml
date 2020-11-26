@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+
+<resources>
+    <style name="Theme.Base" >
+        <item name="android:navigationBarColor">?colorPrimary</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>

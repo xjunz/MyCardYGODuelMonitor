@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+
+<resources>
+    <dimen name="spacing_normal">16dp</dimen>
+    <dimen name="spacing_unit">8dp</dimen>
+    <dimen name="spacing_large">32dp</dimen>
+    <dimen name="z_item">1dp</dimen>
+</resources>

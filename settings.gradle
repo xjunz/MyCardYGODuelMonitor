@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "萌卡观战提醒"

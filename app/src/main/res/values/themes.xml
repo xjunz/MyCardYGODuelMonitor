@@ -1,0 +1,58 @@
+<!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme" parent="Theme.AppCompat.DayNight">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorAccent">@color/teal_200</item>
+        <item name="android:statusBarColor">?colorPrimary</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:colorEdgeEffect">?colorAccent</item>
+        <item name="android:alertDialogTheme">@style/Theme.Alert</item>
+        <item name="colorControlHighlight">@color/semi_teal_200</item>
+        <item name="colorButtonNormal">?colorAccent</item>
+    </style>
+
+    <style name="Theme.Base">
+        <item name="android:navigationBarColor">?colorPrimaryDark</item>
+    </style>
+
+    <style name="Theme.Base.Translucent">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="Theme.Alert" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="colorPrimary">?colorBackgroundFloating</item>
+        <item name="colorAccent">@color/teal_200</item>
+        <item name="android:windowElevation">@dimen/z_dialog</item>
+        <item name="android:windowAnimationStyle">@style/Sade</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.25</item>
+        <item name="android:windowMinWidthMinor">80%</item>
+    </style>
+
+    <style name="Theme.Base.Dialog">
+        <item name="android:windowAnimationStyle">@style/Sade</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowElevation">10dp</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+        <item name="android:windowMinWidthMinor">80%</item>
+        <item name="android:windowMinWidthMajor">80%</item>
+    </style>
+
+    <!-- a "s"-cale and f-"ade" animation for window transition-->
+    <style name="Sade" parent="@android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/dialog_exit</item>
+    </style>
+
+    <dimen name="z_dialog">10dp</dimen>
+</resources>

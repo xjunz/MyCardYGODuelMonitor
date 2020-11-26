@@ -1,0 +1,94 @@
+<!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+
+<resources>
+    <string name="app_name">萌卡YGO观战助手</string>
+    <string name="vs">VS</string>
+    <string name="loading">加载中</string>
+    <string name="unknown">未知</string>
+    <string name="def_notification_title">新的精彩对局!</string>
+    <string name="delayed_notification_title">已开始%d分钟!</string>
+    <string name="def_notification_content"><![CDATA[排名<b>%1d</b>的<b>%1s</b> <i>VS</i> 排名<b>%2d</b>的<b>%2s</b>]]></string>
+    <string name="service_on">监测服务正在运行…</string>
+    <string name="service_off">监测服务未运行</string>
+    <string name="watch_list">观战列表</string>
+    <string name="def_username">此处为您的用户名</string>
+    <string name="def_token">此处为您的Token</string>
+    <string name="hint_set_username">您的萌卡用户名</string>
+    <string name="hint_set_token">您的观战Token</string>
+    <string name="title_token_and_username">直接跳转观战需完成配置</string>
+    <string name="i_don_not_give_a_fuck">我才不管咧</string>
+    <string name="msg_reset_watch_config_in_settings">您可在设置中重新设置您的用户名和Token</string>
+    <string name="msg_input_uncompletely">请输入完整</string>
+    <string name="des_token_and_username">为了本应用能直接跳转到观战，请配置用户名和观战"Token"。用户名为您在YGO Mobile中登录的<b>萌卡账号的用户名</b>，
+        观战"Token"则是竞技房的房间密码中<b>"M#"之前</b>的部分，您可以进入任意观战并退出以进入下图页面查看(框中部分)。
+       </string>
+    <string name="monitoring_focused_duels"><b>正在监测精彩对局…</b></string>
+    <string name="settings">设置</string>
+    <string name="watch_username">观战用户名</string>
+    <string name="watch_token">观战Token</string>
+    <string name="notification">通知</string>
+    <string name="duel_notify_condition">对局推送条件</string>
+    <string name="duel_notify_time">对局推送时机</string>
+    <string name="network">网络</string>
+    <string name="duel_rank_load_timeout">对局双方排名加载超时时长</string>
+    <string name="duel_rank_auto_try_times">对局双方排名加载超时自动重试次数</string>
+    <string name="ranking_list_load_timeout">决斗排行榜加载超时时长</string>
+    <string name="help">帮助</string>
+    <string name="basic">基本</string>
+    <string name="pls_input">请输入%s</string>
+    <string name="username">用户名</string>
+    <string name="bracketed_unset"><![CDATA[<未设置>]]></string>
+    <string name="push_white_hot">推送白热化对局</string>
+    <string name="and">且</string>
+    <string name="or">或</string>
+    <string name="player_rank_range">玩家%d的排名位于%d到%d之间</string>
+    <string name="player_rank_less_than">玩家%d的排名小于等于%d</string>
+    <string name="player_rank_larger_than">玩家%d的排名大于等于%d</string>
+    <string name="player1_rank">玩家1排名</string>
+    <string name="player2_rank">玩家2排名</string>
+    <string name="help_token_and_username">为了防止冒名，每个用户名对应唯一一个观战Token。服务端会检查您输入的用户名与Token是否匹配，如果不匹配，您将无法进入观战。</string>
+    <string name="token_illustration">TOKEN演示</string>
+    <string name="token_over_length">Token长度为8位，请确认您的输入</string>
+    <string name="hint_rank">0或空则不设限</string>
+    <string name="stop_limit">上限</string>
+    <string name="watch">观战</string>
+    <string name="rank_list">排行榜</string>
+    <string name="refresh">刷新</string>
+    <string name="start_limit">下限</string>
+    <string name="push_all">全部推送</string>
+    <string name="push_minutes_after_duel">对局开始后几分钟推送</string>
+    <string name="caption_push">请输入对局开始几分钟后推送，输入0表示对局开始时就推送，一般对局时长在20分钟以内。
+        若推送之前对局已结束，则取消推送，因此<b>设置过长的延时可能导致错过推送哦</b>。</string>
+    <string name="push_delay_zero">当精彩对局开始时</string>
+    <string name="push_delay">当精彩对局开始%d分钟后</string>
+    <string name="seconds">%d秒</string>
+    <string name="times">%d次</string>
+    <string name="no_retry">不重试加载</string>
+    <string name="help_whitehot">应用会智能检测可能的白热化精彩对局，如果您有兴趣，请打开此选项。</string>
+    <string name="caption_duel_rank_load_timeout">对局双方排名加载成功后，我们才能判断此对局是否符合推送条件。如果加载超时，则可能错过推送。</string>
+    <string name="service_reconnected">服务重连成功!</string>
+    <string name="service_closed">服务已关闭!</string>
+    <string name="monitoring_service_stopped"><b>监测服务已停止</b></string>
+    <string name="starting_monitoring_service"><b>正在启动监测服务…</b></string>
+    <string name="duel_notify_behaviour">对局通知推送行为</string>
+    <string name="notify_in_single_id">替换掉已有通知</string>
+    <string name="notify_in_multi_ids">每次新增一条通知</string>
+    <string name="reconnect_when_closed_remotely">服务器关闭连接后自动重连</string>
+    <string name="help_connect">当客户端连接到服务端较长时间后，服务端会自动断开与客户端的连接以节约服务器资源。</string>
+    <string name="about">关于</string>
+    <string name="developer">开发者</string>
+    <string name="check_update">检查更新</string>
+    <string name="check_sourcecode">查看源代码</string>
+    <string name="open_source_project_used">使用的开源项目</string>
+    <string name="donate">捐赠</string>
+    <string name="feedback">反馈&amp;加入交流群</string>
+    <string name="broswer_chooser_title">请选择打开方式</string>
+    <string name="checking_update">正在检查更新</string>
+    <string name="chek_update_failed">检查更新失败</string>
+    <string name="new_version_available">检测到新版本!</string>
+    <string name="new_version_msg">新版本:%s\n更新日志:%s</string>
+    <string name="download">下载</string>
+    <string name="no_new_version">已是最新版本</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="?android:colorBackground" />
+    <stroke
+        android:width="@dimen/z_item"
+        android:color="?colorAccent" />
+    <corners android:radius="2dp" />
+</shape>

@@ -1,0 +1,43 @@
+<!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+  <path
+      android:pathData="M17,58l37.031,54.1 52.313,-29.813L92,58H78c-1.02,1.264 -9.152,11 -23,11 -1.624,0 -14.308,-0.22 -23,-11Z">
+    <aapt:attr name="android:fillColor">
+      <gradient 
+          android:startY="104.736"
+          android:startX="74.263"
+          android:endY="45.063"
+          android:endX="52.543"
+          android:type="linear">
+        <item android:offset="0" android:color="#00FFFFFF"/>
+        <item android:offset="1" android:color="#5B000000"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <path
+      android:pathData="M19.469,48.568H31.6c1.277,-1.482 9.84,-11.093 23.589,-10.775C68.156,38.092 76.08,47 77.43,48.568H89.561"
+      android:strokeWidth="7"
+      android:fillColor="#00000000"
+      android:strokeColor="#fff"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M54.515,53.398m-6.066,0a6.066,6.066 0,1 1,12.132 0a6.066,6.066 0,1 1,-12.132 0"
+      android:strokeWidth="7"
+      android:fillColor="#00000000"
+      android:strokeColor="#fff"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M89.561,58H77.43C76.153,59.486 67.589,69.1 53.841,68.78 40.874,68.48 32.95,59.572 31.6,58H19.469"
+      android:strokeWidth="7"
+      android:fillColor="#00000000"
+      android:strokeColor="#fff"
+      android:strokeLineCap="round"/>
+</vector>
