@@ -71,6 +71,7 @@ public class WatchService extends Service {
     private static final int DEF_DUEL_NOTIFICATION_ID = 1999;
     private int mDuelNotificationId = DEF_DUEL_NOTIFICATION_ID;
     private HashMap<String, Integer> mNotifiedDuels;
+    private String mCurrentShowedSingleIdDuel;
     private String FOREGROUND_CHANNEL_ID;
     private String PUSH_CHANNEL_ID;
     private String mCurrentWhiteHotDuelId;
@@ -122,15 +123,6 @@ public class WatchService extends Service {
     public boolean onUnbind(Intent intent) {
         mDuelCallback = null;
         return super.onUnbind(intent);
-    }
-
-    private int getDuelNotificationId() {
-        if (App.config().notifyInSingleId.getValue()) {
-            return DEF_DUEL_NOTIFICATION_ID;
-        } else {
-            mDuelNotificationId++;
-            return mDuelNotificationId;
-        }
     }
 
     @Override
@@ -258,16 +250,21 @@ public class WatchService extends Service {
     }
 
     private void notifyDuel(@NonNull Duel duel, Notification notification) {
-        int id = getDuelNotificationId();
-        mNotificationManager.notify(id, notification);
-        mNotifiedDuels.put(duel.getId(), id);
+        if (App.config().notifyInSingleId.getValue()) {
+            mNotificationManager.notify(DEF_DUEL_NOTIFICATION_ID, notification);
+            mCurrentShowedSingleIdDuel = duel.getId();
+        } else {
+            mDuelNotificationId++;
+            mNotificationManager.notify(mDuelNotificationId, notification);
+            mNotifiedDuels.put(duel.getId(), mDuelNotificationId);
+        }
     }
 
     private class MyCardWssClient extends WebSocketClient {
         private static final String EVENT_INIT = "init";
         private static final String EVENT_DELETE = "delete";
         private static final String EVENT_CREATE = "create";
-        private LoadPlayerInfoService mLoadPlayerInfoService;
+        private final LoadPlayerInfoService mLoadPlayerInfoService;
 
         public MyCardWssClient(URI serverUri) {
             super(serverUri);
@@ -382,6 +379,9 @@ public class WatchService extends Service {
                                     //noinspection ConstantConditions
                                     mNotificationManager.cancel(mNotifiedDuels.get(id));
                                     mNotifiedDuels.remove(id);
+                                }
+                                if (id.equals(mCurrentShowedSingleIdDuel)) {
+                                    mNotificationManager.cancel(DEF_DUEL_NOTIFICATION_ID);
                                 }
                                 for (int i = 0; i < mDuels.size(); i++) {
                                     if (id.equals(mDuels.get(i).getId())) {
