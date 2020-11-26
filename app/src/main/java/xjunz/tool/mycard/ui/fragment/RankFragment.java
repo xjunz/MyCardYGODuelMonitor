@@ -7,7 +7,6 @@ package xjunz.tool.mycard.ui.fragment;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -183,9 +182,11 @@ public class RankFragment extends Fragment {
 
     private class RankAdapter extends RecyclerView.Adapter<PlayerViewHolder> {
         private final int colorAccent;
+        private final int colorTextSecondary;
 
         private RankAdapter() {
             colorAccent = Utils.getAttrColor(requireContext(), R.attr.colorAccent);
+            colorTextSecondary = Utils.getAttrColor(requireContext(), android.R.attr.textColorSecondary);
         }
 
         @NonNull
@@ -225,11 +226,10 @@ public class RankFragment extends Fragment {
                     holder.trend.setTextColor(colorAccent);
                 } else if (player.getPtTrendIndex() < -5) {
                     holder.trend.setText("↓");
-                    holder.trend.setTextColor(Color.BLACK);
+                    holder.trend.setTextColor(colorTextSecondary);
                 } else {
                     holder.trend.setText("—");
-                    holder.trend.setText("↓");
-                    holder.trend.setTextColor(Color.BLACK);
+                    holder.trend.setTextColor(colorTextSecondary);
                 }
             } else {
                 holder.trend.setVisibility(View.GONE);
