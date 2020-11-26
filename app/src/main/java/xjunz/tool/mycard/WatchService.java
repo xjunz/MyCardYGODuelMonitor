@@ -196,7 +196,7 @@ public class WatchService extends Service {
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, -1, intent, PendingIntent.FLAG_IMMUTABLE);
 
-        builder.setSmallIcon(R.drawable.ic_baseline_local_fire_department_24)
+        builder.setSmallIcon(R.drawable.ic_baseline_eye_24)
                 .setContentText(content)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setOngoing(true)
