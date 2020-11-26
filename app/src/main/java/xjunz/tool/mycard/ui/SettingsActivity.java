@@ -59,7 +59,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             @Override
             public boolean illegalInput(String input) {
-                return input.length() != 8;
+                return input.length() > 0 && input.length() != 8;
             }
 
             @Override
