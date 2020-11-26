@@ -4,7 +4,6 @@
 
 package xjunz.tool.mycard.ui.fragment;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,11 +20,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Objects;
 
 import xjunz.tool.mycard.App;
 import xjunz.tool.mycard.R;
 import xjunz.tool.mycard.WatchService;
 import xjunz.tool.mycard.api.bean.Duel;
+import xjunz.tool.mycard.ui.MasterToast;
 import xjunz.tool.mycard.ui.WatchSetupActivity;
 import xjunz.tool.mycard.util.Utils;
 
@@ -73,7 +74,7 @@ public class WatchFragment extends Fragment implements WatchService.DuelCallback
     public void onDuelCreated(int index) {
         if (mDuelAdapter != null) {
             LinearLayoutManager llm = (LinearLayoutManager) mRvDuel.getLayoutManager();
-            int last = llm.findLastVisibleItemPosition();
+            int last = Objects.requireNonNull(llm).findLastVisibleItemPosition();
             if (last == index - 1) {
                 mDuelAdapter.notifyItemInserted(index);
                 mRvDuel.smoothScrollToPosition(index);
@@ -161,17 +162,16 @@ public class WatchFragment extends Fragment implements WatchService.DuelCallback
             name1 = itemView.findViewById(R.id.tv_player_1);
             name2 = itemView.findViewById(R.id.tv_player_2);
             itemView.setOnClickListener(v -> {
-                try {
-                    if (App.config().hasCompleteWatchConfig()) {
-                        startActivity(Utils.buildLaunchWatchIntent(mDuels.get(getAdapterPosition()).getId()));
-                    } else {
-                        Intent intent = new Intent(requireActivity(), WatchSetupActivity.class);
-                        intent.putExtra(WatchSetupActivity.EXTRA_DUEL_ID, mDuels.get(getAdapterPosition()).getId());
-                        startActivity(intent);
-                    }
-                } catch (ActivityNotFoundException e) {
-                    //没安装YGO Mobile
-                    //TODO
+                if (!App.isYGOMobileInstalled()) {
+                    MasterToast.shortToast(R.string.ygo_mobile_not_installed);
+                    return;
+                }
+                if (App.config().hasCompleteWatchConfig()) {
+                    Utils.launchWatch(requireContext(), mDuels.get(getAdapterPosition()).getId());
+                } else {
+                    Intent intent = new Intent(requireActivity(), WatchSetupActivity.class);
+                    intent.putExtra(WatchSetupActivity.EXTRA_DUEL_ID, mDuels.get(getAdapterPosition()).getId());
+                    startActivity(intent);
                 }
             });
         }

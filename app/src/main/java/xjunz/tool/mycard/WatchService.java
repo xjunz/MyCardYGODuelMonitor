@@ -73,11 +73,12 @@ public class WatchService extends Service {
     private HashMap<String, Integer> mNotifiedDuels;
     private String FOREGROUND_CHANNEL_ID;
     private String PUSH_CHANNEL_ID;
+    private String mCurrentWhiteHotDuelId;
     private Timer mWhiteHotTimer;
     private final TimerTask mWhiteHotChecker = new TimerTask() {
         @Override
         public void run() {
-            if (App.config().pushWhiteHot.getValue()) {
+            if (App.config().pushWhiteHot.getValue() && mCurrentWhiteHotDuelId == null) {
                 Duel candidate = null;
                 int minRankSum = Integer.MAX_VALUE;
                 for (int i = 0; i < Math.min(mDuels.size(), 5); i++) {
@@ -96,9 +97,10 @@ public class WatchService extends Service {
                     }
                 }
                 if (candidate != null) {
+                    mCurrentWhiteHotDuelId = candidate.getId();
                     notifyDuel(candidate, buildWatchNotification(getString(R.string.new_white_hot)
                             , Html.fromHtml(getResources().getString(R.string.def_notification_content, candidate.getPlayer1Rank(), candidate.getPlayer1Name(), candidate.getPlayer2Rank(), candidate.getPlayer2Name()))
-                            , candidate.getId()));
+                            , mCurrentWhiteHotDuelId));
                 }
             }
         }
@@ -195,7 +197,6 @@ public class WatchService extends Service {
         Notification.Builder builder = new Notification.Builder(this.getApplicationContext());
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, -1, intent, PendingIntent.FLAG_IMMUTABLE);
-
         builder.setSmallIcon(R.drawable.ic_baseline_eye_24)
                 .setContentText(content)
                 .setDefaults(Notification.DEFAULT_ALL)
@@ -210,7 +211,7 @@ public class WatchService extends Service {
 
     private Notification buildWatchNotification(CharSequence title, CharSequence content, String duelId) {
         Intent intent;
-        if (!App.config().hasCompleteWatchConfig()) {
+        if (!App.config().hasCompleteWatchConfig() || !App.isYGOMobileInstalled()) {
             intent = new Intent(this, WatchSetupActivity.class);
             intent.putExtra(WatchSetupActivity.EXTRA_DUEL_ID, duelId);
         } else {
@@ -266,9 +267,11 @@ public class WatchService extends Service {
         private static final String EVENT_INIT = "init";
         private static final String EVENT_DELETE = "delete";
         private static final String EVENT_CREATE = "create";
+        private LoadPlayerInfoService mLoadPlayerInfoService;
 
         public MyCardWssClient(URI serverUri) {
             super(serverUri);
+            mLoadPlayerInfoService = Utils.createRetrofit(App.config().duelRankLoadTimeout.getValue()).create(LoadPlayerInfoService.class);
         }
 
         @Override
@@ -277,7 +280,7 @@ public class WatchService extends Service {
         }
 
         private void loadPlayer1Rank(@NonNull Duel duel, boolean shouldNotify, int time) {
-            Utils.createRetrofit(App.config().duelRankLoadTimeout.getValue()).create(LoadPlayerInfoService.class).loadPlayerInfo(duel.getPlayer1Name()).enqueue(new Utils.CallbackAdapter<Player>() {
+            mLoadPlayerInfoService.loadPlayerInfo(duel.getPlayer1Name()).enqueue(new Utils.CallbackAdapter<Player>() {
                 @Override
                 public void onResponse(@NonNull Call<Player> call, @NonNull Response<Player> response) {
                     duel.setPlayer1(response.body());
@@ -296,7 +299,7 @@ public class WatchService extends Service {
         }
 
         private void loadPlayer2Rank(@NonNull Duel duel, boolean shouldNotify, int time) {
-            Utils.createRetrofit(App.config().duelRankLoadTimeout.getValue()).create(LoadPlayerInfoService.class).loadPlayerInfo(duel.getPlayer2Name()).enqueue(new Utils.CallbackAdapter<Player>() {
+            mLoadPlayerInfoService.loadPlayerInfo(duel.getPlayer2Name()).enqueue(new Utils.CallbackAdapter<Player>() {
                 @Override
                 public void onResponse(@NonNull Call<Player> call, @NonNull Response<Player> response) {
                     duel.setPlayer2(response.body());
@@ -339,6 +342,7 @@ public class WatchService extends Service {
             }
         }
 
+
         private void loadPlayerRank(@NonNull Duel duel, boolean shouldNotify) {
             loadPlayer1Rank(duel, shouldNotify, App.config().duelRankLoadRetryTimes.getValue());
             loadPlayer2Rank(duel, shouldNotify, App.config().duelRankLoadRetryTimes.getValue());
@@ -370,8 +374,12 @@ public class WatchService extends Service {
                                     return;
                                 }
                                 String id = jobj.getString("data");
+                                if (id.equals(mCurrentWhiteHotDuelId)) {
+                                    mCurrentWhiteHotDuelId = null;
+                                }
                                 //取消通知
                                 if (mNotifiedDuels.containsKey(id)) {
+                                    //noinspection ConstantConditions
                                     mNotificationManager.cancel(mNotifiedDuels.get(id));
                                     mNotifiedDuels.remove(id);
                                 }

@@ -26,10 +26,15 @@ public class WatchSetupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!App.isYGOMobileInstalled()) {
+            MasterToast.shortToast(R.string.ygo_mobile_not_installed);
+            finish();
+            return;
+        }
         duelId = getIntent().getStringExtra(EXTRA_DUEL_ID);
         if (App.config().hasCompleteWatchConfig()) {
             if (duelId != null) {
-                startActivity(Utils.buildLaunchWatchIntent(duelId));
+                Utils.launchWatch(this, duelId);
             } else {
                 MasterToast.shortToast("Unexpected null duel id.");
             }
@@ -58,14 +63,14 @@ public class WatchSetupActivity extends AppCompatActivity {
         App.config().token.setValue(token);
         MasterToast.longToast(R.string.msg_reset_watch_config_in_settings);
         if (duelId != null) {
-            startActivity(Utils.buildLaunchWatchIntent(duelId));
+            Utils.launchWatch(this, duelId);
         }
         finishAfterTransition();
     }
 
     public void ignoreUsername(View view) {
         if (duelId != null) {
-            startActivity(Utils.buildLaunchWatchIntent(getString(R.string.def_username), getString(R.string.def_token), duelId));
+            Utils.launchWatch(this, getString(R.string.def_username), getString(R.string.def_token), duelId);
         }
     }
 

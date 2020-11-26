@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
 
     private WatchFragment mWatchFragment;
     private RankFragment mRankFragment;
-
     private ActivityMainBinding mBinding;
     private boolean mIsServiceConnected;
     private final ServiceConnection mConn = new ServiceConnection() {
@@ -55,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
         initViews();
         initPages();
         bindService(new Intent(this, WatchService.class), mConn, BIND_AUTO_CREATE);

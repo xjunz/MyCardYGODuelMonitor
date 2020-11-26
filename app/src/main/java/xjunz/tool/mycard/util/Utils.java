@@ -31,9 +31,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import xjunz.tool.mycard.App;
+import xjunz.tool.mycard.R;
 import xjunz.tool.mycard.api.Constants;
+import xjunz.tool.mycard.ui.MasterToast;
 
 public class Utils {
+
     @Nullable
     public static String fetchAsStringFromURL(String urlStr) {
         try {
@@ -58,7 +61,23 @@ public class Utils {
         return null;
     }
 
-    @NonNull
+
+    public static void launchWatch(@NonNull Context context, String roomId) {
+        if (App.isYGOMobileInstalled()) {
+            context.startActivity(buildLaunchWatchIntent(App.config().username.getValue(), App.config().token.getValue(), roomId));
+        } else {
+            MasterToast.shortToast(R.string.start_watch_failed);
+        }
+    }
+
+    public static void launchWatch(@NonNull Context context, String watchAs, String token, String roomId) {
+        if (App.isYGOMobileInstalled()) {
+            context.startActivity(buildLaunchWatchIntent(watchAs, token, roomId));
+        } else {
+            MasterToast.shortToast(R.string.start_watch_failed);
+        }
+    }
+
     public static Intent buildLaunchWatchIntent(String roomId) {
         return buildLaunchWatchIntent(App.config().username.getValue(), App.config().token.getValue(), roomId);
     }
@@ -67,7 +86,6 @@ public class Utils {
     public static Intent buildLaunchWatchIntent(String watchAs, String token, String roomId) {
         Intent intent = new Intent("ygomobile.intent.action.GAME");
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setPackage("cn.garymb.ygomobile");
         intent.putExtra("host", "tiramisu.mycard.moe");
         intent.putExtra("port", 8911);
         intent.putExtra("user", watchAs);
@@ -82,7 +100,6 @@ public class Utils {
         return color;
     }
 
-    ;
 
     @NonNull
     public static String formatDate(Locale locale, long timestamp) {

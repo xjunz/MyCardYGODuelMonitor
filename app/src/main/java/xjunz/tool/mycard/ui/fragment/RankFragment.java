@@ -44,6 +44,7 @@ public class RankFragment extends Fragment {
     private ProgressBar mProgress;
     private ImageButton mIbRefresh;
     private View mMask;
+    private LoadHistoryService mLoadHistoryService;
 
     @Nullable
     @Override
@@ -150,8 +151,10 @@ public class RankFragment extends Fragment {
 
     private void loadDecksOf(@NonNull Player player) {
         String playerName = player.getUsername();
-        LoadHistoryService service = Utils.createRetrofit().create(LoadHistoryService.class);
-        Call<HistorySet> call = service.loadHistoryOf(playerName);
+        if (mLoadHistoryService == null) {
+            mLoadHistoryService = Utils.createRetrofit().create(LoadHistoryService.class);
+        }
+        Call<HistorySet> call = mLoadHistoryService.loadHistoryOf(playerName);
         mLoadDeckCalls.add(call);
         call.enqueue(new Utils.CallbackAdapter<HistorySet>() {
             @Override
