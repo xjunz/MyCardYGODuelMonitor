@@ -91,4 +91,8 @@
     <string name="new_version_msg">新版本:%s\n更新日志:%s</string>
     <string name="download">下载</string>
     <string name="no_new_version">已是最新版本</string>
+    <string name="join_group_failed">加群失败，已复制群号到剪贴板</string>
+    <string name="donate_failed">捐赠失败，感谢您的支持。</string>
+    <string name="new_white_hot">新的白热化对局!</string>
+    <string name="me">xjunz</string>
 </resources>

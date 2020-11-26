@@ -13,10 +13,10 @@
     </data>
 
     <androidx.core.widget.NestedScrollView
-        android:scrollbars="vertical"
-        android:scrollbarThumbVertical="@drawable/bg_scrollbar_thumb"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:scrollbarThumbVertical="@drawable/bg_scrollbar_thumb"
+        android:scrollbars="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -61,6 +61,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:text="@{versionName}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                     android:textColor="?android:textColorSecondaryInverse"
@@ -70,13 +71,13 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:onClick="showDeveloper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_selectable"
                 android:clickable="true"
                 android:elevation="@dimen/z_item"
-                android:focusable="true">
+                android:focusable="true"
+                android:onClick="showDeveloper">
 
                 <TextView
                     android:id="@+id/tv_title_developer"
@@ -94,7 +95,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_unit"
                     android:layout_marginBottom="@dimen/spacing_normal"
-                    android:text="xjunz"
+                    android:text="@string/me"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/tv_title_developer"
                     app:layout_constraintTop_toBottomOf="@+id/tv_title_developer" />
@@ -107,11 +108,11 @@
                     app:layout_constraintStart_toStartOf="parent" />
 
                 <Button
-                    android:onClick="donate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:elevation="0dp"
+                    android:onClick="donate"
                     android:stateListAnimator="@animator/flat_raise"
                     android:text="@string/donate"
                     android:textColor="?android:textColorPrimaryInverse"
@@ -121,13 +122,13 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:onClick="checkUpdate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_selectable"
                 android:clickable="true"
                 android:elevation="@dimen/z_item"
-                android:focusable="true">
+                android:focusable="true"
+                android:onClick="checkUpdate">
 
                 <TextView
                     android:id="@+id/tv_title_check_update"
@@ -151,13 +152,13 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:onClick="viewSource"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_selectable"
                 android:clickable="true"
                 android:elevation="@dimen/z_item"
-                android:focusable="true">
+                android:focusable="true"
+                android:onClick="viewSource">
 
                 <TextView
                     android:id="@+id/tv_title_check_sourcecode"
@@ -181,13 +182,13 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:onClick="feedback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_selectable"
                 android:clickable="true"
                 android:elevation="@dimen/z_item"
-                android:focusable="true">
+                android:focusable="true"
+                android:onClick="feedback">
 
                 <TextView
                     android:id="@+id/tv_title_feedback"

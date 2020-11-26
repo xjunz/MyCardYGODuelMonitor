@@ -5,6 +5,8 @@
 package xjunz.tool.mycard.ui;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -64,7 +66,7 @@ public class AboutActivity extends AppCompatActivity {
 
     public void showDeveloper(View view) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse("http://www.coolapk.com/u/639020"));
+        intent.setData(Uri.parse("https://mycard.moe/ygopro/arena/#/userinfo?username=xjunz"));
         startActivity(Intent.createChooser(intent, getString(R.string.broswer_chooser_title)));
     }
 
@@ -84,9 +86,7 @@ public class AboutActivity extends AppCompatActivity {
                     new AlertDialog.Builder(AboutActivity.this)
                             .setTitle(R.string.new_version_available)
                             .setMessage(getString(R.string.new_version_msg, info.getVersionName(), info.getChangelog()))
-                            .setPositiveButton(getString(R.string.download), (dialog, which) -> {
-                                viewURL(info.getDownloadURL());
-                            }).setPositiveButton(android.R.string.cancel, null).show();
+                            .setPositiveButton(getString(R.string.download), (dialog, which) -> viewURL(info.getDownloadURL())).setPositiveButton(android.R.string.cancel, null).show();
                 } else {
                     MasterToast.shortToast(R.string.no_new_version);
                 }
@@ -103,10 +103,28 @@ public class AboutActivity extends AppCompatActivity {
         viewURL("https://github.com/xjunz/MyCardYGODuelMonitor");
     }
 
+    private static final String QQ_GROUP_NUM = "684446998";
+
     public void feedback(View view) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("mqqapi://card/show_pslcard?src_type=internal&version=1&uin=" + QQ_GROUP_NUM + "&card_type=group&source=qrcode"));
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            MasterToast.shortToast(R.string.join_group_failed);
+            ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            cm.setPrimaryClip(new ClipData("q_group_num", new String[]{"text/plain"}, new ClipData.Item(QQ_GROUP_NUM)));
+        }
     }
 
     public void donate(View view) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx154567xmljmwmkmchc65?t=1606376518084"));
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            MasterToast.shortToast(R.string.donate_failed);
+        }
     }
 
     private class OsAdapter extends RecyclerView.Adapter<OsViewHolder> {
@@ -135,9 +153,7 @@ public class AboutActivity extends AppCompatActivity {
             super(itemView);
             name = itemView.findViewById(R.id.tv_name);
             license = itemView.findViewById(R.id.tv_license);
-            itemView.setOnClickListener(v -> {
-                viewURL(OS_PROJECTS_URL[getAdapterPosition()]);
-            });
+            itemView.setOnClickListener(v -> viewURL(OS_PROJECTS_URL[getAdapterPosition()]));
         }
     }
 }

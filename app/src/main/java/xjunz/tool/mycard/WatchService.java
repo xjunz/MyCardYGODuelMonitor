@@ -32,6 +32,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -42,8 +44,8 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Response;
 import xjunz.tool.mycard.api.Constants;
+import xjunz.tool.mycard.api.LoadPlayerInfoService;
 import xjunz.tool.mycard.api.bean.Duel;
-import xjunz.tool.mycard.api.bean.LoadPlayerInfoService;
 import xjunz.tool.mycard.api.bean.Player;
 import xjunz.tool.mycard.ui.MainActivity;
 import xjunz.tool.mycard.ui.WatchSetupActivity;
@@ -71,6 +73,36 @@ public class WatchService extends Service {
     private HashMap<String, Integer> mNotifiedDuels;
     private String FOREGROUND_CHANNEL_ID;
     private String PUSH_CHANNEL_ID;
+    private Timer mWhiteHotTimer;
+    private final TimerTask mWhiteHotChecker = new TimerTask() {
+        @Override
+        public void run() {
+            if (App.config().pushWhiteHot.getValue()) {
+                Duel candidate = null;
+                int minRankSum = Integer.MAX_VALUE;
+                for (int i = 0; i < Math.min(mDuels.size(), 5); i++) {
+                    long cur = System.currentTimeMillis();
+                    Duel duel = mDuels.get(i);
+                    if (duel.getStartTimestamp() != 0 && cur - duel.getStartTimestamp() >= 15 * 60 * 1000) {
+                        if (duel.getPlayer1Rank() != 0 && duel.getPlayer1Rank() <= 1500) {
+                            if (duel.getPlayer2Rank() != 0 && duel.getPlayer2Rank() <= 1500) {
+                                int curRankSum = duel.getPlayer1Rank() + duel.getPlayer2Rank();
+                                if (curRankSum <= minRankSum) {
+                                    minRankSum = curRankSum;
+                                    candidate = duel;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (candidate != null) {
+                    notifyDuel(candidate, buildWatchNotification(getString(R.string.new_white_hot)
+                            , Html.fromHtml(getResources().getString(R.string.def_notification_content, candidate.getPlayer1Rank(), candidate.getPlayer1Name(), candidate.getPlayer2Rank(), candidate.getPlayer2Name()))
+                            , candidate.getId()));
+                }
+            }
+        }
+    };
 
     @NonNull
 
@@ -340,7 +372,7 @@ public class WatchService extends Service {
                                 String id = jobj.getString("data");
                                 //取消通知
                                 if (mNotifiedDuels.containsKey(id)) {
-                                    mNotificationManager.cancel("", mNotifiedDuels.get(id));
+                                    mNotificationManager.cancel(mNotifiedDuels.get(id));
                                     mNotifiedDuels.remove(id);
                                 }
                                 for (int i = 0; i < mDuels.size(); i++) {
@@ -355,8 +387,15 @@ public class WatchService extends Service {
                                 if (mDuels == null) {
                                     return;
                                 }
+                                //只有当新建了对局才启动白热化检测任务
+                                //因为EVENT_INIT获取的对局我们不知道其开始时间
+                                if (mWhiteHotTimer == null) {
+                                    mWhiteHotTimer = new Timer();
+                                    mWhiteHotTimer.schedule(mWhiteHotChecker, 0L, 5000L);
+                                }
                                 JSONObject data = jobj.getJSONObject("data");
                                 Duel duel = new Duel();
+                                duel.setStartTimestamp(System.currentTimeMillis());
                                 duel.setId(data.getString("id"));
                                 JSONArray players = data.getJSONArray("users");
                                 duel.setPlayer1Name(players.getJSONObject(0).getString("username"));
@@ -423,6 +462,10 @@ public class WatchService extends Service {
         if (mClient != null && !mClient.isClosed()) {
             mNotifyClientClosure = false;
             mClient.close();
+        }
+        if (mWhiteHotTimer != null) {
+            mWhiteHotTimer.cancel();
+            mWhiteHotTimer.purge();
         }
         for (CountDownTimer timer : mCountDownTimers) {
             timer.cancel();

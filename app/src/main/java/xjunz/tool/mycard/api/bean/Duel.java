@@ -15,6 +15,7 @@ public class Duel {
     private Player player1;
     private Player player2;
     private String id;
+    private long startTimestamp;
 
     public String getPlayer1Name() {
         return player1Name;
@@ -101,5 +102,13 @@ public class Duel {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public long getStartTimestamp() {
+        return startTimestamp;
+    }
+
+    public void setStartTimestamp(long startTimestamp) {
+        this.startTimestamp = startTimestamp;
     }
 }
