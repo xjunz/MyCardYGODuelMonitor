@@ -35,6 +35,7 @@ import xjunz.tool.mycard.api.LoadPlayerListService;
 import xjunz.tool.mycard.api.bean.FrequencyDeck;
 import xjunz.tool.mycard.api.bean.HistorySet;
 import xjunz.tool.mycard.api.bean.Player;
+import xjunz.tool.mycard.ui.MasterToast;
 import xjunz.tool.mycard.util.Utils;
 
 public class RankFragment extends Fragment {
@@ -98,7 +99,7 @@ public class RankFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<List<Player>> call, @NonNull Throwable t) {
                 super.onFailure(call, t);
-                t.printStackTrace();
+                MasterToast.shortToast(getString(R.string.load_failed, t.getMessage()));
             }
 
             @Override

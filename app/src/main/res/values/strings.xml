@@ -95,4 +95,5 @@
     <string name="donate_failed">捐赠失败，感谢您的支持。</string>
     <string name="new_white_hot">新的白热化对局!</string>
     <string name="me">xjunz</string>
+    <string name="load_failed">加载失败: %s</string>
 </resources>
