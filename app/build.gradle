@@ -23,6 +23,8 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            multiDexEnabled true
+            signingConfig signingConfigs.xjunz
         }
     }
     compileOptions {

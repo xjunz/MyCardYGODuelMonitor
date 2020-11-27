@@ -86,9 +86,9 @@
     <string name="feedback">反馈&amp;加入交流群</string>
     <string name="broswer_chooser_title">请选择打开方式</string>
     <string name="checking_update">正在检查更新</string>
-    <string name="chek_update_failed">检查更新失败</string>
+    <string name="check_update_failed">检查更新失败</string>
     <string name="new_version_available">检测到新版本!</string>
-    <string name="new_version_msg">新版本:%s\n更新日志:%s</string>
+    <string name="new_version_msg">新版本:%s\n更新日志:%s\n体积:%s</string>
     <string name="download">下载</string>
     <string name="no_new_version">已是最新版本</string>
     <string name="join_group_failed">加群失败，已复制群号到剪贴板</string>

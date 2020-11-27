@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +25,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Objects;
 
-import xjunz.coolapkcheckupdatezerosdk.ApkInfo;
-import xjunz.coolapkcheckupdatezerosdk.UpdateChecker;
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import xjunz.tool.mycard.R;
+import xjunz.tool.mycard.api.CheckUpdateService;
+import xjunz.tool.mycard.api.Constants;
+import xjunz.tool.mycard.api.bean.UpdateInfo;
 import xjunz.tool.mycard.databinding.ActivityAboutBinding;
+import xjunz.tool.mycard.util.Utils;
 
 public class AboutActivity extends AppCompatActivity {
     private ActivityAboutBinding mBinding;
@@ -70,33 +78,63 @@ public class AboutActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(intent, getString(R.string.broswer_chooser_title)));
     }
 
-    public void checkUpdate(View view) {
-        new UpdateChecker(getPackageName(), new UpdateChecker.UpdateCheckCallback() {
-            @Override
-            public void onStart() {
-                MasterToast.shortToast(R.string.checking_update);
-            }
+    private CheckUpdateService mCheckUpdateService;
+    private long mLastCheckTimestamp;
 
+    public void checkUpdate(View view) {
+        if (mCheckUpdateService == null) {
+            OkHttpClient client = new OkHttpClient.Builder().build();
+            mCheckUpdateService = new Retrofit.Builder()
+                    .baseUrl(Constants.CHECK_UPDATE_BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(client)
+                    .build().create(CheckUpdateService.class);
+        }
+        if (mLastCheckTimestamp != 0 && System.currentTimeMillis() - mLastCheckTimestamp <= 5 * 1000) {
+            MasterToast.shortToast(R.string.try_later);
+            return;
+        }
+        MasterToast.shortToast(R.string.checking_update);
+        mLastCheckTimestamp = System.currentTimeMillis();
+        mCheckUpdateService.checkUpdate(Constants.CHECK_UPDATE_FIR_API_TOKEN).enqueue(new Utils.CallbackAdapter<UpdateInfo>() {
             @Override
-            public void onSuccess(ApkInfo info) {
+            public void onResponse(@NonNull Call<UpdateInfo> call, @NonNull Response<UpdateInfo> response) {
+                super.onResponse(call, response);
                 if (AboutActivity.this.isDestroyed()) {
                     return;
                 }
-                if (!mVersionName.equals(info.getVersionName())) {
+                UpdateInfo info = response.body();
+                if (info == null) {
+                    MasterToast.shortToast(R.string.check_update_failed);
+                    return;
+                }
+                if (!mVersionName.equals(info.getVersionShort())) {
                     new AlertDialog.Builder(AboutActivity.this)
                             .setTitle(R.string.new_version_available)
-                            .setMessage(getString(R.string.new_version_msg, info.getVersionName(), info.getChangelog()))
-                            .setPositiveButton(getString(R.string.download), (dialog, which) -> viewURL(info.getDownloadURL())).setPositiveButton(android.R.string.cancel, null).show();
+                            .setMessage(getString(R.string.new_version_msg,
+                                    info.getVersionShort(),
+                                    info.getChangelog(),
+                                    Formatter.formatFileSize(AboutActivity.this, info.getBinary().getFsize())))
+                            .setPositiveButton(getString(R.string.download), (dialog, which) -> {
+                                viewURL(info.getInstallUrl());
+                                MasterToast.shortToast(R.string.what_if_download_fail);
+                            }).setNegativeButton(android.R.string.cancel, null).show();
                 } else {
                     MasterToast.shortToast(R.string.no_new_version);
                 }
             }
 
             @Override
-            public void onFail() {
-                MasterToast.shortToast(R.string.chek_update_failed);
+            public void onFailure(@NonNull Call<UpdateInfo> call, @NonNull Throwable t) {
+                super.onFailure(call, t);
+                MasterToast.shortToast(R.string.check_update_failed);
             }
-        }).start();
+
+            @Override
+            public void onWhatever() {
+            }
+        });
+
     }
 
     public void viewSource(View view) {
