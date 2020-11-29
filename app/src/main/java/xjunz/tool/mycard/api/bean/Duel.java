@@ -4,21 +4,36 @@
 
 package xjunz.tool.mycard.api.bean;
 
+import androidx.annotation.IntRange;
 import androidx.annotation.Nullable;
 
 import java.util.Objects;
 
-public class Duel {
+import xjunz.tool.mycard.App;
+
+public class Duel implements Comparable<Duel> {
 
     private String player1Name;
     private String player2Name;
     private Player player1;
     private Player player2;
     private String id;
+    public static final int SORT_BY_ORDINAL = 0;
     private long startTimestamp;
+    public static final int SORT_BY_RANK_SUM = 1;
+    public static final int SORT_BY_RANK_MINOR = 2;
+    private int ordinal;
 
     public String getPlayer1Name() {
         return player1Name;
+    }
+
+    public String getPlayerName(int which) {
+        return which == 1 ? getPlayer1Name() : which == 2 ? getPlayer2Name() : null;
+    }
+
+    public int getPlayerRank(int which) {
+        return which == 1 ? getPlayer1Rank() : which == 2 ? getPlayer2Rank() : -1;
     }
 
     public void setPlayer1Name(String player1Name) {
@@ -57,6 +72,13 @@ public class Duel {
         this.id = id;
     }
 
+    public int getOrdinal() {
+        return ordinal;
+    }
+
+    public void setOrdinal(int ordinal) {
+        this.ordinal = ordinal;
+    }
 
     public boolean isPlayer1Pro() {
         if (player1 == null) {
@@ -111,4 +133,29 @@ public class Duel {
     public void setStartTimestamp(long startTimestamp) {
         this.startTimestamp = startTimestamp;
     }
+
+    private int getCompareRank(@IntRange(from = 1, to = 2) int whichPlayer) {
+        int rank = whichPlayer == 1 ? getPlayer1Rank() : getPlayer2Rank();
+        if (rank == -1) {
+            return 1000 * 10000 + ordinal;
+        } else if (rank == 0) {
+            return 100 * 10000 + ordinal;
+        }
+        return rank;
+    }
+
+    @Override
+    public int compareTo(Duel o) {
+        int multiplier = App.config().watchListAscending.get() ? 1 : -1;
+        switch (App.config().watchListSortBy.get()) {
+            case SORT_BY_ORDINAL:
+                return multiplier * Integer.compare(ordinal, o.getOrdinal());
+            case SORT_BY_RANK_MINOR:
+                return multiplier * Integer.compare(Math.min(getCompareRank(1), getCompareRank(2)), Math.min(o.getCompareRank(1), o.getCompareRank(2)));
+            case SORT_BY_RANK_SUM:
+                return multiplier * Integer.compare(getCompareRank(1) + getCompareRank(2), o.getCompareRank(1) + o.getCompareRank(2));
+        }
+        return 0;
+    }
+
 }

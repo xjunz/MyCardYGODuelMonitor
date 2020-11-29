@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="host"
+            type="xjunz.tool.mycard.ui.fragment.SortFragment" />
+
+        <variable
+            name="sortBy"
+            type="androidx.databinding.ObservableInt" />
+
+        <variable
+            name="ascending"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/sort_configuration"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_sort_by"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/sort_by"
+            android:textColor="?colorAccent"
+            app:layout_constraintStart_toStartOf="@+id/textView4"
+            app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+        <Spinner
+            android:id="@+id/sp_sort_by"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:entries="@array/sort_by"
+            android:selection="@={sortBy}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_sort_by" />
+
+        <TextView
+            android:id="@+id/tv_order_by"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/order_by"
+            android:textColor="?colorAccent"
+            app:layout_constraintStart_toStartOf="@+id/tv_sort_by"
+            app:layout_constraintTop_toBottomOf="@+id/sp_sort_by" />
+
+        <RadioGroup
+            android:id="@+id/rg_order"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:checkedButton="@{ascending?@id/ib_ascending:@id/ib_descending}"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tv_order_by"
+            app:layout_constraintTop_toBottomOf="@+id/tv_order_by">
+
+            <RadioButton
+                android:id="@+id/ib_ascending"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="@={ascending}"
+                android:text="@string/ascending" />
+
+            <RadioButton
+                android:id="@+id/ib_descending"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/descending" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/btn_apply"
+            style="@style/Widget.AppCompat.Button.Flat.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:onClick="@{()->host.apply()}"
+            android:text="@string/apply"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rg_order" />
+
+        <Button
+            style="@style/Widget.AppCompat.Button.Borderless.Colored.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:onClick="@{()->host.dismiss()}"
+            android:text="@android:string/cancel"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_apply"
+            app:layout_constraintEnd_toStartOf="@+id/btn_apply"
+            app:layout_constraintTop_toTopOf="@+id/btn_apply" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

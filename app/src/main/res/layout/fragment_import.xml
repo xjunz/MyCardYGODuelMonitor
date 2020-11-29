@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="success"
+            type="androidx.databinding.ObservableBoolean" />
+
+        <variable
+            name="loading"
+            type="androidx.databinding.ObservableBoolean" />
+
+        <variable
+            name="host"
+            type="xjunz.tool.mycard.ui.fragment.ImportFragment" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginHorizontal="@dimen/spacing_normal"
+            android:layout_marginTop="16dp"
+            android:gone="@{loading||!success}"
+            android:text="@string/pls_select_player_to_import"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_import"
+            style="@style/CustomVerticalScrollbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/tv_title"
+            android:layout_marginTop="16dp"
+            android:gone="@{loading||!success}"
+            android:paddingBottom="@{btnOk.height+2*(int)@dimen/spacing_unit}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_import" />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="@dimen/progress_width"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="32dp"
+            android:gone="@{!loading}"
+            android:indeterminate="true"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_ok"
+            style="@style/Widget.AppCompat.Button.Flat.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/rv_import"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/spacing_unit"
+            android:layout_marginBottom="@dimen/spacing_unit"
+            android:gone="@{loading||!success}"
+            android:onClick="@{()->host.confirm()}"
+            android:text="@android:string/ok" />
+
+        <Button
+            style="@style/Widget.AppCompat.Button.Borderless.Colored.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/btn_ok"
+            android:layout_toStartOf="@id/btn_ok"
+            android:gone="@{loading||!success}"
+            android:onClick="@{()->host.dismiss()}"
+            android:text="@android:string/cancel" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="32dp"
+            android:gone="@{loading||success}"
+            android:onClick="@{()->host.loadList()}"
+            android:text="@string/retry"
+            android:textColor="@android:color/white" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_above="@id/btn_ok"
+            android:layout_marginBottom="@dimen/spacing_unit"
+            android:background="?android:attr/listDivider" />
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_below="@id/tv_title"
+            android:layout_marginTop="@dimen/spacing_normal"
+            android:background="?android:attr/listDivider"
+            android:gone="@{loading||!success}" />
+    </RelativeLayout>
+</layout>

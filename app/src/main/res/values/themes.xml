@@ -11,11 +11,12 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:colorEdgeEffect">?colorAccent</item>
         <item name="android:alertDialogTheme">@style/Theme.Alert</item>
-        <item name="colorControlHighlight">@color/semi_teal_200</item>
         <item name="colorButtonNormal">?colorAccent</item>
+        <item name="colorControlNormal">?colorAccent</item>
     </style>
 
     <style name="Theme.Base">
+        <item name="colorControlHighlight">@color/semi_teal_200</item>
         <item name="android:navigationBarColor">?colorPrimaryDark</item>
     </style>
 
@@ -31,21 +32,31 @@
     <style name="Theme.Alert" parent="Theme.AppCompat.DayNight.Dialog.Alert">
         <item name="colorPrimary">?colorBackgroundFloating</item>
         <item name="colorAccent">@color/teal_200</item>
+        <item name="colorButtonNormal">?colorAccent</item>
         <item name="android:windowElevation">@dimen/z_dialog</item>
         <item name="android:windowAnimationStyle">@style/Sade</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.25</item>
         <item name="android:windowMinWidthMinor">80%</item>
+        <item name="android:buttonBarPositiveButtonStyle">
+            @style/Widget.AppCompat.Button.Flat.Small
+        </item>
+        <item name="android:buttonBarNegativeButtonStyle">
+            @style/Widget.AppCompat.Button.Borderless.Colored.Small
+        </item>
+        <item name="android:buttonBarNeutralButtonStyle">
+            @style/Widget.AppCompat.Button.Borderless.Colored.Small
+        </item>
     </style>
 
     <style name="Theme.Base.Dialog">
         <item name="android:windowAnimationStyle">@style/Sade</item>
-        <item name="android:backgroundDimEnabled">false</item>
         <item name="android:windowElevation">10dp</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowMinWidthMinor">80%</item>
-        <item name="android:windowMinWidthMajor">80%</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.25</item>
     </style>
 
     <!-- a "s"-cale and f-"ade" animation for window transition-->
@@ -54,5 +65,27 @@
         <item name="android:windowExitAnimation">@anim/dialog_exit</item>
     </style>
 
-    <dimen name="z_dialog">10dp</dimen>
+    <style name="CustomVerticalScrollbar">
+        <item name="android:scrollbarSize">4dp</item>
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:scrollbarThumbVertical">@drawable/bg_scrollbar_thumb</item>
+    </style>
+    <!-- flat button style -->
+    <style name="Widget.AppCompat.Button.Flat">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:stateListAnimator">@animator/flat_raise</item>
+    </style>
+
+    <!-- flat small-sized button style (such as positive dialog button) -->
+    <style name="Widget.AppCompat.Button.Flat.Small">
+        <item name="android:background">@drawable/bg_btn_small</item>
+    </style>
+
+
+    <!-- borderless small-sized button style (such as negative dialog button) -->
+    <style name="Widget.AppCompat.Button.Borderless.Colored.Small">
+        <item name="android:background">@drawable/bg_btn_borderless_small</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
 </resources>

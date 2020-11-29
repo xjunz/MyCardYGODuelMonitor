@@ -9,10 +9,10 @@
         <item name="colorAccent">@color/teal_200</item>
         <item name="android:statusBarColor">?colorPrimary</item>
         <item name="android:colorEdgeEffect">?colorAccent</item>
-        <item name="colorControlHighlight">@color/semi_teal_200</item>
     </style>
 
     <style name="Theme.Base">
+        <item name="colorControlHighlight">@color/semi_teal_200</item>
         <item name="android:navigationBarColor">?colorPrimaryDark</item>
     </style>
 

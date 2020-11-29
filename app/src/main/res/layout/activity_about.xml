@@ -7,16 +7,13 @@
 
     <data>
 
-        <variable
-            name="versionName"
-            type="String" />
+        <import type="xjunz.tool.mycard.App" />
     </data>
 
     <androidx.core.widget.NestedScrollView
+        style="@style/CustomVerticalScrollbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbarThumbVertical="@drawable/bg_scrollbar_thumb"
-        android:scrollbars="vertical">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,7 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="@{versionName}"
+                    android:text="@{App.getVersionName()}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                     android:textColor="?android:textColorSecondaryInverse"
                     android:textStyle="italic"
@@ -129,6 +126,18 @@
                 android:elevation="@dimen/z_item"
                 android:focusable="true"
                 android:onClick="checkUpdate">
+
+                <View
+                    android:id="@+id/update_badge"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginStart="4dp"
+                    android:background="@drawable/bg_fab"
+                    android:elevation="@dimen/z_item"
+                    android:gone="@{!App.hasUpdate()}"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toEndOf="@+id/tv_title_check_update"
+                    app:layout_constraintTop_toTopOf="@+id/tv_title_check_update" />
 
                 <TextView
                     android:id="@+id/tv_title_check_update"

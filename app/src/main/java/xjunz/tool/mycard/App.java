@@ -11,10 +11,24 @@ import android.content.pm.PackageManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import xjunz.tool.mycard.api.CheckUpdateService;
+import xjunz.tool.mycard.api.Constants;
+import xjunz.tool.mycard.api.bean.UpdateInfo;
+import xjunz.tool.mycard.util.Utils;
+
 public class App extends Application {
     private static Settings sSettings;
     private static Context sApplicationContext;
     private static boolean sIsYGOMobileInstalled;
+
+
+    private static boolean sHasUpdate;
+    private static String sVersionName;
 
     public static Context getContext() {
         return sApplicationContext;
@@ -22,6 +36,18 @@ public class App extends Application {
 
     public static boolean isYGOMobileInstalled() {
         return sIsYGOMobileInstalled;
+    }
+
+    public static String getVersionName() {
+        return sVersionName;
+    }
+
+    public static void setHasUpdate(boolean sHasUpdate) {
+        App.sHasUpdate = sHasUpdate;
+    }
+
+    public static boolean hasUpdate() {
+        return sHasUpdate;
     }
 
     @Override
@@ -35,6 +61,29 @@ public class App extends Application {
         } catch (PackageManager.NameNotFoundException e) {
             sIsYGOMobileInstalled = false;
         }
+        try {
+            sVersionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        CheckUpdateService checkUpdateService = new Retrofit.Builder()
+                .baseUrl(Constants.CHECK_UPDATE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build().create(CheckUpdateService.class);
+        checkUpdateService.checkUpdate(Constants.CHECK_UPDATE_FIR_API_TOKEN).enqueue(new Utils.CallbackAdapter<UpdateInfo>() {
+            @Override
+            public void onResponse(@NonNull Call<UpdateInfo> call, @NonNull Response<UpdateInfo> response) {
+                super.onResponse(call, response);
+                UpdateInfo info = response.body();
+                if (info != null) {
+                    if (!sVersionName.equals(info.getVersionShort())) {
+                        sHasUpdate = true;
+                    }
+                }
+            }
+        });
     }
 
     @NonNull

@@ -45,7 +45,6 @@ public class WatchSetupActivity extends AppCompatActivity {
         mEtUsername = findViewById(R.id.et_username);
         mEtToken = findViewById(R.id.et_token);
         mEtUsername.setFilters(new InputFilter[]{new InputFilter.LengthFilter(20)});
-
     }
 
     public void confirm(View view) {

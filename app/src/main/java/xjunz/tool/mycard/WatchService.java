@@ -35,11 +35,16 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.net.ssl.SSLParameters;
+
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
-import io.reactivex.Single;
-import io.reactivex.SingleOnSubscribe;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -58,24 +63,22 @@ public class WatchService extends Service {
      */
     private List<Duel> mDuels;
     private WebSocketClient mClient;
-    private final CompositeDisposable mDisposables = new CompositeDisposable();
-    private DuelCallback mDuelCallback;
-    private NotificationManager mNotificationManager;
-    private List<CountDownTimer> mCountDownTimers;
-    private final ObservableInt mServiceStatus = new ObservableInt(STATUS_CLOSED);
-    private boolean mNotifyClientClosure = true;
     public static final int STATUS_CLOSED = -1;
     public static final int STATUS_CONNECTING = 0;
     public static final int STATUS_OPENED = 1;
     private static final int FOREGROUND_NOTIFICATION_ID = 814;
     private static final int DEF_DUEL_NOTIFICATION_ID = 1999;
+    private final ObservableInt mServiceStatus = new ObservableInt(STATUS_CLOSED);
+    private DuelCallback mDuelCallback;
+    private NotificationManager mNotificationManager;
+    private List<CountDownTimer> mCountDownTimers;
+    private boolean mNotifyClientClosure = true;
     private int mDuelNotificationId = DEF_DUEL_NOTIFICATION_ID;
     private HashMap<String, Integer> mNotifiedDuels;
     private String mCurrentShowedSingleIdDuel;
     private String FOREGROUND_CHANNEL_ID;
     private String PUSH_CHANNEL_ID;
     private String mCurrentWhiteHotDuelId;
-    private Timer mWhiteHotTimer;
     private final TimerTask mWhiteHotChecker = new TimerTask() {
         @Override
         public void run() {
@@ -101,11 +104,14 @@ public class WatchService extends Service {
                     mCurrentWhiteHotDuelId = candidate.getId();
                     notifyDuel(candidate, buildWatchNotification(getString(R.string.new_white_hot)
                             , Html.fromHtml(getResources().getString(R.string.def_notification_content, candidate.getPlayer1Rank(), candidate.getPlayer1Name(), candidate.getPlayer2Rank(), candidate.getPlayer2Name()))
-                            , mCurrentWhiteHotDuelId));
+                            , candidate));
                 }
             }
         }
     };
+    private Timer mWhiteHotTimer;
+    private Disposable mOnMessageDisposable;
+    private int mOrdinalOfAllDuels;
 
     @NonNull
 
@@ -135,6 +141,7 @@ public class WatchService extends Service {
             FOREGROUND_CHANNEL_ID = getPackageName() + ":foreground";
             PUSH_CHANNEL_ID = getPackageName() + ":push";
             NotificationChannel foregroundChannel = new NotificationChannel(FOREGROUND_CHANNEL_ID, getString(getApplicationInfo().labelRes), NotificationManager.IMPORTANCE_HIGH);
+            foregroundChannel.setShowBadge(false);
             mNotificationManager.createNotificationChannel(foregroundChannel);
             NotificationChannel pushChannel = new NotificationChannel(PUSH_CHANNEL_ID, getString(getApplicationInfo().labelRes), NotificationManager.IMPORTANCE_HIGH);
             pushChannel.setShowBadge(true);
@@ -161,28 +168,33 @@ public class WatchService extends Service {
     }
 
     private void beginDelayPush(int min, Duel duel) {
-        CountDownTimer timer = new CountDownTimer(min * 60 * 1000, 100) {
+        Completable.create(new CompletableOnSubscribe() {
             @Override
-            public void onTick(long millisUntilFinished) {
-                if (!mDuels.contains(duel)) {
-                    cancel();
-                    mCountDownTimers.remove(this);
-                }
-            }
+            public void subscribe(@io.reactivex.annotations.NonNull CompletableEmitter emitter) throws Exception {
+                //timer要在main thread中创建[Handler.java:227]
+                CountDownTimer timer = new CountDownTimer(min * 60 * 1000, 100) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        if (!mDuels.contains(duel)) {
+                            cancel();
+                            mCountDownTimers.remove(this);
+                        }
+                    }
 
-            @Override
-            public void onFinish() {
-                if (mDuels.contains(duel)) {
-                    mCountDownTimers.remove(this);
-                    Notification notification = buildWatchNotification(
-                            getResources().getString(R.string.delayed_notification_title, min)
-                            , Html.fromHtml(getResources().getString(R.string.def_notification_content, duel.getPlayer1Rank(), duel.getPlayer1Name(), duel.getPlayer2Rank(), duel.getPlayer2Name()))
-                            , duel.getId());
-                    notifyDuel(duel, notification);
-                }
+                    @Override
+                    public void onFinish() {
+                        mCountDownTimers.remove(this);
+                        if (mDuels.contains(duel)) {
+                            String whiteListedPlayer = App.config().enableWhitelist.getValue() ? duel.getPlayerName(App.config().isWhitelisted(duel)) : null;
+                            notifyDuel(duel, buildWatchNotification(
+                                    whiteListedPlayer == null ? getString(R.string.delayed_notification_title, min) : getString(R.string.whitelisted_delayed_notification_title, whiteListedPlayer, min)
+                                    , buildNotificationContent(duel), duel));
+                        }
+                    }
+                }.start();
+                mCountDownTimers.add(timer);
             }
-        }.start();
-        mCountDownTimers.add(timer);
+        }).subscribeOn(AndroidSchedulers.mainThread()).subscribe();
     }
 
     private Notification buildForegroundNotification(CharSequence content) {
@@ -201,13 +213,13 @@ public class WatchService extends Service {
         return builder.build();
     }
 
-    private Notification buildWatchNotification(CharSequence title, CharSequence content, String duelId) {
+    private Notification buildWatchNotification(CharSequence title, CharSequence content, Duel duel) {
         Intent intent;
         if (!App.config().hasCompleteWatchConfig() || !App.isYGOMobileInstalled()) {
             intent = new Intent(this, WatchSetupActivity.class);
-            intent.putExtra(WatchSetupActivity.EXTRA_DUEL_ID, duelId);
+            intent.putExtra(WatchSetupActivity.EXTRA_DUEL_ID, duel.getId());
         } else {
-            intent = Utils.buildLaunchWatchIntent(duelId);
+            intent = Utils.buildLaunchWatchIntent(duel.getId());
         }
         PendingIntent pendingIntent = PendingIntent.getActivity(this, mDuelNotificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder builder = new Notification.Builder(this.getApplicationContext());
@@ -217,8 +229,10 @@ public class WatchService extends Service {
                 .setContentText(content)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setContentIntent(pendingIntent)
-                .setSubText(Utils.formatDate(getResources().getConfiguration().locale, timestamp))
                 .setWhen(timestamp);
+        if (duel.getStartTimestamp() > 0) {
+            builder.setSubText(getString(R.string.duel_started_at, Utils.formatDate(getResources().getConfiguration().locale, duel.getStartTimestamp())));
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setChannelId(PUSH_CHANNEL_ID);
         }
@@ -249,6 +263,17 @@ public class WatchService extends Service {
         }
     }
 
+    private CharSequence buildNotificationContent(@NonNull Duel duel) {
+        if (duel.getPlayer1Rank() <= 0 && duel.getPlayer2Rank() > 0) {
+            return Html.fromHtml(getString(R.string.player1_unranked_notification_content, duel.getPlayer1Name(), duel.getPlayer2Rank(), duel.getPlayer2Name()));
+        } else if (duel.getPlayer1Rank() > 0 && duel.getPlayer2Rank() <= 0) {
+            return Html.fromHtml(getString(R.string.player2_unranked_notification_content, duel.getPlayer1Rank(), duel.getPlayer1Name(), duel.getPlayer2Name()));
+        } else if (duel.getPlayer2Rank() <= 0 && duel.getPlayer1Rank() <= 0) {
+            return Html.fromHtml(getString(R.string.unranked_notification_content, duel.getPlayer1Name(), duel.getPlayer2Name()));
+        }
+        return Html.fromHtml(getString(R.string.def_notification_content, duel.getPlayer1Rank(), duel.getPlayer1Name(), duel.getPlayer2Rank(), duel.getPlayer2Name()));
+    }
+
     private void notifyDuel(@NonNull Duel duel, Notification notification) {
         if (App.config().notifyInSingleId.getValue()) {
             mNotificationManager.notify(DEF_DUEL_NOTIFICATION_ID, notification);
@@ -260,6 +285,39 @@ public class WatchService extends Service {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mOnMessageDisposable != null) {
+            mOnMessageDisposable.dispose();
+        }
+        if (mClient != null && !mClient.isClosed()) {
+            mNotifyClientClosure = false;
+            mClient.close();
+        }
+        if (mWhiteHotTimer != null) {
+            mWhiteHotTimer.cancel();
+            mWhiteHotTimer.purge();
+        }
+        for (CountDownTimer timer : mCountDownTimers) {
+            timer.cancel();
+        }
+    }
+
+    public void setDuelCallback(DuelCallback duelCallback) {
+        this.mDuelCallback = duelCallback;
+    }
+
+    public interface DuelCallback {
+        void onInitList(List<Duel> initialDuels);
+
+        void onDuelCreated(Duel duel);
+
+        void onDuelDeleted(String id);
+
+        void onPlayerRankGot(Duel duel);
+    }
+
     private class MyCardWssClient extends WebSocketClient {
         private static final String EVENT_INIT = "init";
         private static final String EVENT_DELETE = "delete";
@@ -269,6 +327,15 @@ public class WatchService extends Service {
         public MyCardWssClient(URI serverUri) {
             super(serverUri);
             mLoadPlayerInfoService = Utils.createRetrofit(App.config().duelRankLoadTimeout.getValue()).create(LoadPlayerInfoService.class);
+        }
+
+        @Override
+        protected void onSetSSLParameters(SSLParameters sslParameters) {
+            //https://github.com/TooTallNate/Java-WebSocket/wiki/No-such-method-error-setEndpointIdentificationAlgorithm
+            if (Build.VERSION.SDK_INT < 24) {
+                return;
+            }
+            super.onSetSSLParameters(sslParameters);
         }
 
         @Override
@@ -316,23 +383,18 @@ public class WatchService extends Service {
 
         private void notifyWhenLoadComplete(@NonNull Duel duel, boolean shouldNotify) {
             if (duel.getPlayer1() != null && duel.getPlayer2() != null) {
-                int index = mDuels.indexOf(duel);
-                if (index >= 0) {
-                    if (mDuelCallback != null) {
-                        mDuelCallback.onPlayerRankGot(index);
-                    }
-                    if (shouldNotify) {
-                        if (App.config().isDuelInPushCondition(duel)) {
-                            int delay = App.config().pushDelayMin.getValue();
-                            if (delay > 0) {
-                                beginDelayPush(delay, duel);
-                            } else {
-                                Notification notification = buildWatchNotification(
-                                        getResources().getString(R.string.def_notification_title)
-                                        , Html.fromHtml(getResources().getString(R.string.def_notification_content, duel.getPlayer1Rank(), duel.getPlayer1Name(), duel.getPlayer2Rank(), duel.getPlayer2Name()))
-                                        , duel.getId());
-                                notifyDuel(duel, notification);
-                            }
+                if (mDuelCallback != null) {
+                    mDuelCallback.onPlayerRankGot(duel);
+                }
+                if (shouldNotify) {
+                    if (App.config().isDuelInPushCondition(duel)) {
+                        int delay = App.config().pushDelayMin.getValue();
+                        if (delay > 0) {
+                            beginDelayPush(delay, duel);
+                        } else {
+                            Notification notification = buildWatchNotification(getString(R.string.def_notification_title)
+                                    , buildNotificationContent(duel), duel);
+                            notifyDuel(duel, notification);
                         }
                     }
                 }
@@ -347,90 +409,101 @@ public class WatchService extends Service {
 
         @Override
         public void onMessage(String message) {
-            mDisposables.add(Single.create((SingleOnSubscribe<Pair<String, Integer>>) emitter -> {
-                        JSONObject jobj = new JSONObject(message);
-                        String event = jobj.getString("event");
-                        switch (event) {
-                            case EVENT_INIT:
-                                JSONArray jarray = new JSONArray(jobj.getString("data"));
-                                mDuels = new ArrayList<>();
-                                for (int i = 0; i < jarray.length(); i++) {
-                                    JSONObject data = jarray.getJSONObject(i);
-                                    Duel duel = new Duel();
-                                    duel.setId(data.getString("id"));
-                                    JSONArray players = data.getJSONArray("users");
-                                    duel.setPlayer1Name(players.getJSONObject(0).getString("username"));
-                                    duel.setPlayer2Name(players.getJSONObject(1).getString("username"));
-                                    mDuels.add(duel);
-                                    loadPlayerRank(duel, false);
-                                }
-                                emitter.onSuccess(new Pair<>(event, null));
-                                break;
-                            case EVENT_DELETE:
-                                if (mDuels == null) {
-                                    return;
-                                }
-                                String id = jobj.getString("data");
-                                if (id.equals(mCurrentWhiteHotDuelId)) {
-                                    mCurrentWhiteHotDuelId = null;
-                                }
-                                //取消通知
-                                if (mNotifiedDuels.containsKey(id)) {
-                                    //noinspection ConstantConditions
-                                    mNotificationManager.cancel(mNotifiedDuels.get(id));
-                                    mNotifiedDuels.remove(id);
-                                }
-                                if (id.equals(mCurrentShowedSingleIdDuel)) {
-                                    mNotificationManager.cancel(DEF_DUEL_NOTIFICATION_ID);
-                                }
-                                for (int i = 0; i < mDuels.size(); i++) {
-                                    if (id.equals(mDuels.get(i).getId())) {
-                                        mDuels.remove(i);
-                                        emitter.onSuccess(new Pair<>(event, i));
-                                        return;
-                                    }
-                                }
-                                break;
-                            case EVENT_CREATE:
-                                if (mDuels == null) {
-                                    return;
-                                }
-                                //只有当新建了对局才启动白热化检测任务
-                                //因为EVENT_INIT获取的对局我们不知道其开始时间
-                                if (mWhiteHotTimer == null) {
-                                    mWhiteHotTimer = new Timer();
-                                    mWhiteHotTimer.schedule(mWhiteHotChecker, 0L, 5000L);
-                                }
-                                JSONObject data = jobj.getJSONObject("data");
-                                Duel duel = new Duel();
-                                duel.setStartTimestamp(System.currentTimeMillis());
-                                duel.setId(data.getString("id"));
-                                JSONArray players = data.getJSONArray("users");
-                                duel.setPlayer1Name(players.getJSONObject(0).getString("username"));
-                                duel.setPlayer2Name(players.getJSONObject(1).getString("username"));
-                                mDuels.add(duel);
-                                emitter.onSuccess(new Pair<>(event, null));
-                                loadPlayerRank(duel, true);
-                                break;
+            mOnMessageDisposable = Flowable.create((FlowableOnSubscribe<Pair<String, Object>>) emitter -> {
+                JSONObject jobj = new JSONObject(message);
+                String event = jobj.getString("event");
+                switch (event) {
+                    case EVENT_INIT:
+                        JSONArray jarray = new JSONArray(jobj.getString("data"));
+                        mDuels = new ArrayList<>();
+                        for (int i = 0; i < jarray.length(); i++) {
+                            JSONObject data = jarray.getJSONObject(i);
+                            Duel duel = new Duel();
+                            duel.setId(data.getString("id"));
+                            JSONArray players = data.getJSONArray("users");
+                            duel.setPlayer1Name(players.getJSONObject(0).getString("username"));
+                            duel.setPlayer2Name(players.getJSONObject(1).getString("username"));
+                            duel.setOrdinal(mOrdinalOfAllDuels);
+                            mOrdinalOfAllDuels++;
+                            mDuels.add(duel);
+                            loadPlayerRank(duel, false);
                         }
-                    }).subscribeOn(Schedulers.newThread())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(pair -> {
+                        emitter.onNext(new Pair<>(event, null));
+                        break;
+                    case EVENT_DELETE:
+                        if (mDuels == null) {
+                            return;
+                        }
+                        String id = jobj.getString("data");
+                        if (id.equals(mCurrentWhiteHotDuelId)) {
+                            mCurrentWhiteHotDuelId = null;
+                        }
+                        //取消通知
+                        if (mNotifiedDuels.containsKey(id)) {
+                            //noinspection ConstantConditions
+                            mNotificationManager.cancel(mNotifiedDuels.get(id));
+                            mNotifiedDuels.remove(id);
+                        }
+                        if (id.equals(mCurrentShowedSingleIdDuel)) {
+                            mNotificationManager.cancel(DEF_DUEL_NOTIFICATION_ID);
+                        }
+                        emitter.onNext(new Pair<>(EVENT_DELETE, id));
+                        break;
+                    case EVENT_CREATE:
+                        if (mDuels == null) {
+                            return;
+                        }
+                        //只有当新建了对局才启动白热化检测任务
+                        //因为EVENT_INIT获取的对局我们不知道其开始时间
+                        if (mWhiteHotTimer == null) {
+                            mWhiteHotTimer = new Timer();
+                            mWhiteHotTimer.schedule(mWhiteHotChecker, 0L, 5000L);
+                        }
+                        JSONObject data = jobj.getJSONObject("data");
+                        Duel duel = new Duel();
+                        duel.setStartTimestamp(System.currentTimeMillis());
+                        duel.setId(data.getString("id"));
+                        JSONArray players = data.getJSONArray("users");
+                        duel.setPlayer1Name(players.getJSONObject(0).getString("username"));
+                        duel.setPlayer2Name(players.getJSONObject(1).getString("username"));
+                        duel.setOrdinal(mOrdinalOfAllDuels);
+                        mOrdinalOfAllDuels++;
+                        mDuels.add(duel);
+                        emitter.onNext(new Pair<>(event, duel));
+                        loadPlayerRank(duel, true);
+                        //检查是否有白名单玩家
+                        if (App.config().enableWhitelist.getValue()) {
+                            String whitelisted = duel.getPlayerName(App.config().isWhitelisted(duel));
+                            if (whitelisted != null) {
+                                int delay = App.config().pushDelayMin.getValue();
+                                if (delay > 0) {
+                                    beginDelayPush(delay, duel);
+                                } else {
+                                    notifyDuel(duel, buildWatchNotification(getString(R.string.whitelisted_def_notification_title, whitelisted),
+                                            buildNotificationContent(duel), duel));
+                                }
+                            }
+                        }
+                        break;
+                }
+            }, BackpressureStrategy.BUFFER).subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(pair -> {
                                 if (mDuelCallback != null) {
                                     switch (pair.first) {
                                         case EVENT_INIT:
                                             mDuelCallback.onInitList(mDuels);
                                             break;
                                         case EVENT_CREATE:
-                                            mDuelCallback.onDuelCreated(mDuels.size() - 1);
+                                            mDuelCallback.onDuelCreated((Duel) pair.second);
                                             break;
                                         case EVENT_DELETE:
-                                            mDuelCallback.onDuelDeleted(pair.second);
+                                            mDuelCallback.onDuelDeleted((String) pair.second);
                                             break;
                                     }
                                 }
-                            })
-            );
+                            }
+                    );
         }
 
         @Override
@@ -445,38 +518,6 @@ public class WatchService extends Service {
         @Override
         public void onError(@NonNull Exception ex) {
             ex.printStackTrace();
-        }
-    }
-
-    public interface DuelCallback {
-        void onInitList(List<Duel> initialDuels);
-
-        void onDuelCreated(int index);
-
-        void onDuelDeleted(int index);
-
-        void onPlayerRankGot(int index);
-    }
-
-    public void setDuelCallback(DuelCallback duelCallback) {
-        this.mDuelCallback = duelCallback;
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mDisposables.dispose();
-        if (mClient != null && !mClient.isClosed()) {
-            mNotifyClientClosure = false;
-            mClient.close();
-        }
-        if (mWhiteHotTimer != null) {
-            mWhiteHotTimer.cancel();
-            mWhiteHotTimer.purge();
-        }
-        for (CountDownTimer timer : mCountDownTimers) {
-            timer.cancel();
         }
     }
 }

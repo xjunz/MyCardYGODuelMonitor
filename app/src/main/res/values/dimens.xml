@@ -8,4 +8,10 @@
     <dimen name="spacing_unit">8dp</dimen>
     <dimen name="spacing_large">32dp</dimen>
     <dimen name="z_item">1dp</dimen>
+    <dimen name="z_dialog">10dp</dimen>
+    <dimen name="r_chip">8dp</dimen>
+    <dimen name="z_fab">6dp</dimen>
+    <dimen name="fab_normal">48dp</dimen>
+    <dimen name="progress_width">100dp</dimen>
+    <dimen name="corner_button">2dp</dimen>
 </resources>

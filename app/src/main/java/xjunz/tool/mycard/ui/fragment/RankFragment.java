@@ -4,21 +4,17 @@
 
 package xjunz.tool.mycard.ui.fragment;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnticipateInterpolator;
-import android.view.animation.OvershootInterpolator;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ObservableBoolean;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,44 +27,32 @@ import xjunz.tool.mycard.App;
 import xjunz.tool.mycard.R;
 import xjunz.tool.mycard.api.LoadHistoryService;
 import xjunz.tool.mycard.api.LoadPlayerListService;
-import xjunz.tool.mycard.api.bean.FrequencyDeck;
 import xjunz.tool.mycard.api.bean.HistorySet;
 import xjunz.tool.mycard.api.bean.Player;
+import xjunz.tool.mycard.databinding.FragmentRankBinding;
 import xjunz.tool.mycard.ui.MasterToast;
 import xjunz.tool.mycard.util.Utils;
 
 public class RankFragment extends Fragment {
-    private RecyclerView mRvRank;
     private List<Player> mRankList;
     private RankAdapter mAdapter;
-    private ProgressBar mProgress;
-    private ImageButton mIbRefresh;
-    private View mMask;
     private LoadHistoryService mLoadHistoryService;
+    private final ObservableBoolean mLoading = new ObservableBoolean(true);
+    private FragmentRankBinding mBinding;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return getLayoutInflater().inflate(R.layout.fragment_rank, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_rank, container, false);
+        mBinding.setLoading(mLoading);
+        return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mRvRank = view.findViewById(R.id.rv_rank);
-        mRvRank.setHasFixedSize(true);
-        mProgress = view.findViewById(R.id.progress);
-        mIbRefresh = view.findViewById(R.id.ib_refresh);
-        mMask = view.findViewById(R.id.mask);
-        mIbRefresh.setOnClickListener(v -> {
-            animateHideFAB();
-            mMask.setAlpha(0);
-            mIbRefresh.setEnabled(false);
-            mMask.setVisibility(View.VISIBLE);
-            mProgress.setVisibility(View.VISIBLE);
-            mMask.animate().alpha(0.8f).setListener(null).start();
-            loadRankList();
-        });
+        mBinding.rvRank.setHasFixedSize(true);
+        mBinding.ibRefresh.setOnClickListener(v -> loadRankList());
         loadRankList();
     }
 
@@ -82,6 +66,7 @@ public class RankFragment extends Fragment {
             call.cancel();
         }
         mLoadListCall = Utils.createRetrofit(App.config().rankingListLoadTimeout.getValue()).create(LoadPlayerListService.class).loadPlayerList();
+        mLoading.set(true);
         mLoadListCall.enqueue(new Utils.CallbackAdapter<List<Player>>() {
             @Override
             public void onResponse(@NonNull Call<List<Player>> call, @NonNull Response<List<Player>> response) {
@@ -89,7 +74,7 @@ public class RankFragment extends Fragment {
                 mRankList = response.body();
                 if (mRankList != null) {
                     mAdapter = new RankAdapter();
-                    mRvRank.setAdapter(mAdapter);
+                    mBinding.rvRank.setAdapter(mAdapter);
                     for (Player player : mRankList) {
                         loadDecksOf(player);
                     }
@@ -104,36 +89,10 @@ public class RankFragment extends Fragment {
 
             @Override
             public void onWhatever() {
-                animateShowFAB();
-                mProgress.setVisibility(View.GONE);
-                if (mMask.getVisibility() == View.VISIBLE) {
-                    mMask.animate().setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            mMask.setVisibility(View.GONE);
-                            mIbRefresh.setEnabled(true);
-                        }
-                    }).alpha(0).start();
-                }
+                mLoading.set(false);
                 mLoadListCall = null;
             }
         });
-    }
-
-    private void animateShowFAB() {
-        mIbRefresh.setScaleX(0);
-        mIbRefresh.setScaleY(0);
-        mIbRefresh.setVisibility(View.VISIBLE);
-        mIbRefresh.animate().scaleX(1f).scaleY(1f).setListener(null).setInterpolator(new OvershootInterpolator()).start();
-    }
-
-    private void animateHideFAB() {
-        mIbRefresh.animate().scaleX(0).scaleY(0).setInterpolator(new AnticipateInterpolator()).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mIbRefresh.setVisibility(View.GONE);
-            }
-        }).start();
     }
 
     @Override
@@ -206,22 +165,6 @@ public class RankFragment extends Fragment {
             holder.ordinal.setText(String.valueOf(position + 1));
             holder.name.setText(player.getUsername());
             holder.score.setText(String.format("%.2f", player.getPt()));
-            List<FrequencyDeck> decks = player.getUsedDecks();
-            if (decks == null || decks.size() == 0) {
-                holder.decks.setVisibility(View.GONE);
-            } else {
-                holder.decks.setVisibility(View.VISIBLE);
-                StringBuilder deckSerial = new StringBuilder();
-                int showCount = Math.min(3, decks.size());
-                for (int i = 0; i < showCount; i++) {
-                    if (i == showCount - 1) {
-                        deckSerial.append(decks.get(i).getName());
-                    } else {
-                        deckSerial.append(decks.get(i).getName()).append("|");
-                    }
-                }
-                holder.decks.setText(deckSerial);
-            }
             if (player.getPtTrendIndex() != null) {
                 holder.trend.setVisibility(View.VISIBLE);
                 if (player.getPtTrendIndex() > 5) {
@@ -246,13 +189,13 @@ public class RankFragment extends Fragment {
     }
 
     private static class PlayerViewHolder extends RecyclerView.ViewHolder {
-        TextView name, ordinal, decks, score, trend;
+        TextView name, ordinal, tags, score, trend;
 
         public PlayerViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.tv_name);
             ordinal = itemView.findViewById(R.id.tv_ordinal);
-            decks = itemView.findViewById(R.id.tv_decks);
+            tags = itemView.findViewById(R.id.tv_tags);
             score = itemView.findViewById(R.id.tv_score);
             trend = itemView.findViewById(R.id.tv_trend);
         }

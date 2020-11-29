@@ -10,7 +10,11 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
+import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
+import androidx.databinding.ObservableInt;
+
+import java.util.Set;
 
 import xjunz.tool.mycard.api.bean.Duel;
 
@@ -31,6 +35,10 @@ public class Settings {
     public IntegerSetting rankingListLoadTimeout = new IntegerSetting("ranking_list_load_timeout", 10);
     public BooleanSetting notifyInSingleId = new BooleanSetting("notify_in_single_id", true);
     public BooleanSetting reconnectWhenClosedRemotely = new BooleanSetting("reconnect_when_closed_remotely", false);
+    public BooleanSetting enableWhitelist = new BooleanSetting("enable_whitelist", true);
+    public StringSetSetting pushWhiteList = new StringSetSetting("push_whitelist", null);
+    public ObservableInt watchListSortBy = new ObservableInt(0);
+    public ObservableBoolean watchListAscending = new ObservableBoolean(true);
     private final ObservableField<String> conditionText = new ObservableField<>(player1RankLimit, player2RankLimit, isConditionAnd);
 
     protected Settings(SharedPreferences sp) {
@@ -50,6 +58,16 @@ public class Settings {
             return null;
         }
         return sb.toString();
+    }
+
+    public int isWhitelisted(Duel duel) {
+        if (App.config().enableWhitelist.getValue()) {
+            Set<String> whiteSet = App.config().pushWhiteList.getValue();
+            if (whiteSet != null) {
+                return whiteSet.contains(duel.getPlayer1Name()) ? 1 : whiteSet.contains(duel.getPlayer2Name()) ? 2 : 0;
+            }
+        }
+        return 0;
     }
 
     public ObservableField<String> getPushConditionText() {
@@ -76,8 +94,8 @@ public class Settings {
     public boolean isDuelInPushCondition(@NonNull Duel duel) {
         int[] limit1 = getPlayer1RankRange();
         int[] limit2 = getPlayer2RankRange();
-        boolean a = (limit1[0] == 0 && limit1[1] == 0) || (duel.getPlayer1Rank() > 0 && (limit1[0] == 0 || duel.getPlayer1Rank() >= limit1[0]) && (limit1[1] == 0 || duel.getPlayer1Rank() <= limit1[1]));
-        boolean b = (limit2[0] == 0 && limit2[1] == 0) || (duel.getPlayer2Rank() > 0 && (limit2[0] == 0 || duel.getPlayer2Rank() >= limit2[0]) && (limit2[1] == 0 || duel.getPlayer2Rank() <= limit2[1]));
+        boolean a = (limit1[0] == 0 && limit1[1] == 0) || (duel.getPlayer1Rank() > 0 && ((limit1[0] == 0 || duel.getPlayer1Rank() >= limit1[0]) && (limit1[1] == 0 || duel.getPlayer1Rank() <= limit1[1])));
+        boolean b = (limit2[0] == 0 && limit2[1] == 0) || (duel.getPlayer2Rank() > 0 && ((limit2[0] == 0 || duel.getPlayer2Rank() >= limit2[0]) && (limit2[1] == 0 || duel.getPlayer2Rank() <= limit2[1])));
         return isConditionAnd.getValue() ? a && b : a || b;
     }
 
@@ -99,6 +117,7 @@ public class Settings {
         String key;
         T defValue;
 
+
         Setting(String key, T defValue) {
             this.key = key;
             this.defValue = defValue;
@@ -111,10 +130,11 @@ public class Settings {
         @Bindable
         abstract T getValue();
 
-        abstract void setValueInternal(T value);
+
+        abstract void persistValue(T value);
 
         public void setValue(T value) {
-            setValueInternal(value);
+            persistValue(value);
             notifyPropertyChanged(BR.value);
         }
     }
@@ -131,7 +151,12 @@ public class Settings {
         }
 
         @Override
-        void setValueInternal(Integer value) {
+        public void setValue(Integer value) {
+            super.setValue(value);
+        }
+
+        @Override
+        void persistValue(Integer value) {
             mSP.edit().putInt(key, value).apply();
         }
     }
@@ -148,7 +173,7 @@ public class Settings {
         }
 
         @Override
-        void setValueInternal(String value) {
+        void persistValue(String value) {
             mSP.edit().putString(key, value).apply();
         }
 
@@ -166,13 +191,29 @@ public class Settings {
         }
 
         @Override
-        void setValueInternal(Boolean value) {
+        void persistValue(Boolean value) {
             mSP.edit().putBoolean(key, value).apply();
         }
 
         @Override
         public void setValue(Boolean value) {
             super.setValue(value);
+        }
+    }
+
+    public class StringSetSetting extends Setting<Set<String>> {
+        StringSetSetting(String key, Set<String> defValue) {
+            super(key, defValue);
+        }
+
+        @Override
+        public Set<String> getValue() {
+            return mSP.getStringSet(key, defValue);
+        }
+
+        @Override
+        void persistValue(Set<String> value) {
+            mSP.edit().putStringSet(key, value).apply();
         }
     }
 }

@@ -6,10 +6,15 @@
     <string name="app_name">萌卡YGO观战助手</string>
     <string name="vs">VS</string>
     <string name="loading">加载中</string>
-    <string name="unknown">未知</string>
+    <string name="unknown">无排名</string>
     <string name="def_notification_title">新的精彩对局!</string>
+    <string name="whitelisted_def_notification_title">你关注的%s正在决斗!</string>
     <string name="delayed_notification_title">已开始%d分钟!</string>
+    <string name="whitelisted_delayed_notification_title">你关注的%s正在决斗!已开始%d分钟!</string>
     <string name="def_notification_content"><![CDATA[排名<b>%1d</b>的<b>%1s</b> <i>VS</i> 排名<b>%2d</b>的<b>%2s</b>]]></string>
+    <string name="player1_unranked_notification_content"><![CDATA[<b>%1s</b> <i>VS</i> 排名<b>%d</b>的<b>%2s</b>]]></string>
+    <string name="player2_unranked_notification_content"><![CDATA[排名<b>%d</b>的<b>%1s</b> <i>VS</i> <b>%2s</b>]]></string>
+    <string name="unranked_notification_content"><![CDATA[<b>%1s</b> <i>VS</i> <b>%2s</b>]]></string>
     <string name="service_on">监测服务正在运行…</string>
     <string name="service_off">监测服务未运行</string>
     <string name="watch_list">观战列表</string>
@@ -60,7 +65,7 @@
     <string name="push_all">全部推送</string>
     <string name="push_minutes_after_duel">对局开始后几分钟推送</string>
     <string name="caption_push">请输入对局开始几分钟后推送，输入0表示对局开始时就推送，一般对局时长在20分钟以内。
-        若推送之前对局已结束，则取消推送，因此<b>设置过长的延时可能导致错过推送哦</b>。</string>
+        若推送之前对局已结束，则取消推送，因此<b>设置过长的延时可能导致错过推送哦</b>。推荐设置为10分钟，为了测试通知功能能否在您的设备上正常运行，默认延时为0。</string>
     <string name="push_delay_zero">当精彩对局开始时</string>
     <string name="push_delay">当精彩对局开始%d分钟后</string>
     <string name="seconds">%d秒</string>
@@ -76,7 +81,7 @@
     <string name="notify_in_single_id">替换掉已有通知</string>
     <string name="notify_in_multi_ids">每次新增一条通知</string>
     <string name="reconnect_when_closed_remotely">服务器关闭连接后自动重连</string>
-    <string name="help_connect">当客户端连接到服务端较长时间后，服务端会自动断开与客户端的连接以节约服务器资源。</string>
+    <string name="help_connect">当客户端连接到服务端较长时间后，服务端可能会断开与客户端的连接。</string>
     <string name="about">关于</string>
     <string name="developer">开发者</string>
     <string name="check_update">检查更新</string>
@@ -84,7 +89,7 @@
     <string name="open_source_project_used">使用的开源项目</string>
     <string name="donate">捐赠</string>
     <string name="feedback">反馈&amp;加入交流群</string>
-    <string name="broswer_chooser_title">请选择打开方式</string>
+    <string name="browser_chooser_title">请选择打开方式</string>
     <string name="checking_update">正在检查更新</string>
     <string name="check_update_failed">检查更新失败</string>
     <string name="new_version_available">检测到新版本!</string>
@@ -96,4 +101,35 @@
     <string name="new_white_hot">新的白热化对局!</string>
     <string name="me">xjunz</string>
     <string name="load_failed">加载失败: %s</string>
+    <string name="start_watch_failed">跳转失败，请先安装YGO Mobile客户端</string>
+    <string name="ygo_mobile_not_installed">未安装YGO Mobile</string>
+    <string name="share">分享本应用</string>
+    <string name="what_if_download_fail">如无法下载，也可加群获取最新版。</string>
+    <string name="try_later">请稍后再试</string>
+    <string name="help_white_list">对局中只要包含白名单玩家就会被推送</string>
+    <string name="whitelist">白名单</string>
+    <string name="edit_whitelist">编辑白名单</string>
+    <string name="hint_whitelist">请输入白名单玩家名</string>
+    <string name="remove">移除</string>
+    <string name="add">添加</string>
+    <string name="whitelist_duplication">此玩家已存在，勿重复添加</string>
+    <string name="import_from_rank_list">从排行榜导入</string>
+    <string name="enable_whitelist">启用白名单</string>
+    <string name="pls_select_player_to_import">请选择要导入白名单的玩家</string>
+    <string name="retry">重试</string>
+    <string name="duel_started_at">对局开始于%s</string>
+    <string name="focused_player">你关注的%s</string>
+    <string name="sort">排序</string>
+    <string name="sort_configuration">排序配置</string>
+    <string name="sort_by">排序依据</string>
+    <string name="order_by">排序方式</string>
+    <string name="ascending">升序</string>
+    <string name="descending">降序</string>
+    <string name="apply">应用</string>
+    <string name="whitelisted">已关注</string>
+    <string-array name="sort_by">
+        <item>按时间（默认）</item>
+        <item>按DP排名（双方总和）</item>
+        <item>按DP排名（双方中较低者）</item>
+    </string-array>
 </resources>

@@ -34,19 +34,18 @@ public class MainActivity extends AppCompatActivity {
     private WatchFragment mWatchFragment;
     private RankFragment mRankFragment;
     private ActivityMainBinding mBinding;
-    private boolean mIsServiceConnected;
+    private boolean mIsServiceBound;
     private final ServiceConnection mConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             WatchService.WatchBinder binder = (WatchService.WatchBinder) service;
             binder.getService().setDuelCallback(mWatchFragment);
             mBinding.setStatus(binder.getService().getServiceStatus());
-            mIsServiceConnected = true;
+            mIsServiceBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mIsServiceConnected = false;
         }
     };
 
@@ -138,8 +137,9 @@ public class MainActivity extends AppCompatActivity {
     public void switchService(View view) {
         int statusCode = mBinding.getStatus().get();
         if (statusCode == 1) {
-            if (mIsServiceConnected) {
+            if (mIsServiceBound) {
                 unbindService(mConn);
+                mIsServiceBound = false;
             }
             stopService(new Intent(this, WatchService.class));
         } else if (statusCode == -1) {
@@ -156,8 +156,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mIsServiceConnected) {
+        if (mIsServiceBound) {
             unbindService(mConn);
+            mIsServiceBound = false;
         }
     }
 }

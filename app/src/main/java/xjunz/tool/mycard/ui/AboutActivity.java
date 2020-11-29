@@ -8,7 +8,6 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.Formatter;
@@ -30,6 +29,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import xjunz.tool.mycard.App;
 import xjunz.tool.mycard.R;
 import xjunz.tool.mycard.api.CheckUpdateService;
 import xjunz.tool.mycard.api.Constants;
@@ -42,26 +42,25 @@ public class AboutActivity extends AppCompatActivity {
     private final String[] OS_PROJECTS_NAME = new String[]{"Android Jetpack", "Java WebSocket", "RxJava", "RxAndroid", "Retrofit", "Material design icons"};
     private final String[] OS_PROJECTS_URL = new String[]{"https://github.com/androidx/androidx", "https://github.com/TooTallNate/Java-WebSocket", "https://github.com/ReactiveX/RxJava", "https://github.com/ReactiveX/RxAndroid", "https://github.com/square/retrofit", "https://github.com/google/material-design-icons"};
     private final String[] OS_PROJECTS_LICENSE = new String[]{"Apache License 2.0", "MIT License", "Apache License 2.0", "Apache License 2.0", "Apache License 2.0", "Apache License 2.0"};
-    private String mVersionName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_about);
         mBinding.rvOs.setAdapter(new OsAdapter());
-        try {
-            mVersionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-            mBinding.setVersionName(mVersionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        mCheckUpdateService = new Retrofit.Builder()
+                .baseUrl(Constants.CHECK_UPDATE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build().create(CheckUpdateService.class);
     }
 
     private void viewURL(String url) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url));
-        startActivity(Intent.createChooser(intent, getString(R.string.broswer_chooser_title)));
+        startActivity(Intent.createChooser(intent, getString(R.string.browser_chooser_title)));
     }
 
     @Override
@@ -75,21 +74,13 @@ public class AboutActivity extends AppCompatActivity {
     public void showDeveloper(View view) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("https://mycard.moe/ygopro/arena/#/userinfo?username=xjunz"));
-        startActivity(Intent.createChooser(intent, getString(R.string.broswer_chooser_title)));
+        startActivity(Intent.createChooser(intent, getString(R.string.browser_chooser_title)));
     }
 
     private CheckUpdateService mCheckUpdateService;
     private long mLastCheckTimestamp;
 
     public void checkUpdate(View view) {
-        if (mCheckUpdateService == null) {
-            OkHttpClient client = new OkHttpClient.Builder().build();
-            mCheckUpdateService = new Retrofit.Builder()
-                    .baseUrl(Constants.CHECK_UPDATE_BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .client(client)
-                    .build().create(CheckUpdateService.class);
-        }
         if (mLastCheckTimestamp != 0 && System.currentTimeMillis() - mLastCheckTimestamp <= 5 * 1000) {
             MasterToast.shortToast(R.string.try_later);
             return;
@@ -108,7 +99,9 @@ public class AboutActivity extends AppCompatActivity {
                     MasterToast.shortToast(R.string.check_update_failed);
                     return;
                 }
-                if (!mVersionName.equals(info.getVersionShort())) {
+                if (!App.getVersionName().equals(info.getVersionShort())) {
+                    mBinding.updateBadge.setVisibility(View.VISIBLE);
+                    App.setHasUpdate(true);
                     new AlertDialog.Builder(AboutActivity.this)
                             .setTitle(R.string.new_version_available)
                             .setMessage(getString(R.string.new_version_msg,

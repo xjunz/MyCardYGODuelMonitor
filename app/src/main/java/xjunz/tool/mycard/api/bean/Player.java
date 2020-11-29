@@ -5,15 +5,12 @@
 
 package xjunz.tool.mycard.api.bean;
 
-import android.text.TextUtils;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,7 +59,7 @@ public class Player {
 
     public void setHistorySet(HistorySet set) {
         this.mHistorySet = set;
-        readDeckFromHistory(set);
+        readPtTrend(set);
     }
 
     @Nullable
@@ -81,14 +78,12 @@ public class Player {
         return mDecks;
     }
 
-    private void readDeckFromHistory(@NonNull HistorySet set) {
+    private void readPtTrend(@NonNull HistorySet set) {
         mDecks = new ArrayList<>();
         int size = set.getData().size();
         for (int i = 0; i < size; i++) {
             History history = set.getData().get(i);
-            String deckName = null;
             if (mUsername.equals(history.getUsernamea())) {
-                deckName = history.getDecka();
                 if (i == 0) {
                     mLatestPt = history.getPta();
                 }
@@ -96,7 +91,6 @@ public class Player {
                     mEarliestPt = history.getPtaEx();
                 }
             } else if (mUsername.equals(history.getUsernameb())) {
-                deckName = history.getDeckb();
                 if (i == 0) {
                     mLatestPt = history.getPtb();
                 }
@@ -104,26 +98,7 @@ public class Player {
                     mEarliestPt = history.getPtbEx();
                 }
             }
-            if (!TextUtils.isEmpty(deckName) && !deckName.equals("no deck")) {
-                int index = -1;
-                for (int a = 0; a < mDecks.size(); a++) {
-                    if (deckName.equals(mDecks.get(a).getName())) {
-                        index = a;
-                        break;
-                    }
-                }
-                if (index >= 0) {
-                    mDecks.get(index).increase();
-                } else {
-                    if (mDecks.size() == 0) {
-                        mDecks.add(new FrequencyDeck(deckName, true));
-                    } else {
-                        mDecks.add(new FrequencyDeck(deckName));
-                    }
-                }
-            }
         }
-        Collections.sort(mDecks);
     }
 
     public Long getAthleticAll() {

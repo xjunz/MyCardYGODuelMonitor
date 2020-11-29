@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="enable"
+            type="xjunz.tool.mycard.Settings.BooleanSetting" />
+
+        <variable
+            name="host"
+            type="xjunz.tool.mycard.ui.fragment.WhitelistFragment" />
+    </data>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="@dimen/spacing_normal"
+            android:layout_marginTop="16dp"
+            android:layout_toStartOf="@+id/cb_enable"
+            android:text="@string/edit_whitelist"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/et_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_title"
+            android:layout_alignStart="@+id/tv_title"
+            android:layout_marginTop="@dimen/spacing_normal"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_edit_box"
+            android:ems="10"
+            android:hint="@string/hint_whitelist"
+            android:importantForAutofill="no"
+            android:inputType="textPersonName"
+            android:maxTextCount="@{20}"
+            android:paddingVertical="@dimen/spacing_unit"
+            android:paddingStart="@dimen/spacing_unit"
+            android:paddingEnd="@dimen/fab_normal" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/et_input"
+            android:layout_alignEnd="@id/et_input"
+            android:layout_alignBottom="@+id/et_input"
+            android:contentDescription="@string/add"
+            android:elevation="0dp"
+            android:onClick="@{()->host.addToWhitelist(etInput.getText().toString)}"
+            android:stateListAnimator="@animator/flat_raise"
+            android:theme="@style/Theme"
+            android:tint="@android:color/white"
+            android:tooltip="@{@string/add}"
+            app:srcCompat="@drawable/ic_baseline_add_24" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_whitelist"
+            style="@style/CustomVerticalScrollbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/et_input"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/spacing_unit"
+            android:paddingBottom="@{btnOk.height+2*(int)@dimen/spacing_unit}"
+            app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+            app:spanCount="3"
+            tools:listitem="@layout/item_chip">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <Button
+            android:id="@+id/btn_ok"
+            style="@style/Widget.AppCompat.Button.Flat.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/rv_whitelist"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/spacing_unit"
+            android:layout_marginBottom="@dimen/spacing_unit"
+            android:onClick="@{()->host.confirm()}"
+            android:text="@android:string/ok" />
+
+        <Button
+            android:id="@+id/btn_cancel"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/btn_ok"
+            android:layout_toStartOf="@id/btn_ok"
+            android:onClick="@{()->host.dismiss()}"
+            android:text="@android:string/cancel" />
+
+        <Button
+            android:id="@+id/btn_import"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/btn_ok"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="@dimen/spacing_unit"
+            android:drawableStart="@drawable/ic_baseline_open_in_new_24"
+            android:drawablePadding="4dp"
+            android:onClick="@{()->host.importFromRankList()}"
+            android:text="@string/import_from_rank_list" />
+
+        <CheckBox
+            android:id="@+id/cb_enable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/tv_title"
+            android:layout_alignBottom="@id/tv_title"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/spacing_normal"
+            android:checked="@={enable.value}"
+            android:text="@string/enable_whitelist" />
+
+    </RelativeLayout>
+</layout>

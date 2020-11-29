@@ -5,15 +5,12 @@
 package xjunz.tool.mycard.ui.fragment;
 
 import android.os.Bundle;
-import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
 
@@ -37,10 +34,6 @@ public class ConditionFragment extends DialogFragment {
         return binding.getRoot();
     }
 
-    @BindingAdapter("android:maxTextCount")
-    public static void setMaxTextCount(@NonNull EditText et, int maxCount) {
-        et.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxCount)});
-    }
 
     private Object check(@NonNull String src) {
         return src.length() == 0 ? 0 : src;

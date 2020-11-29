@@ -25,6 +25,7 @@ import xjunz.tool.mycard.R;
 import xjunz.tool.mycard.databinding.ActivitySettingsBinding;
 import xjunz.tool.mycard.ui.fragment.ConditionFragment;
 import xjunz.tool.mycard.ui.fragment.InputFragment;
+import xjunz.tool.mycard.ui.fragment.WhitelistFragment;
 
 public class SettingsActivity extends AppCompatActivity {
     private ActivitySettingsBinding mBinding;
@@ -186,4 +187,7 @@ public class SettingsActivity extends AppCompatActivity {
         }).setTitle(getString(R.string.duel_rank_auto_try_times)).show(getSupportFragmentManager(), "dr_retry_timeout");
     }
 
+    public void configWhitelist(View view) {
+        new WhitelistFragment().show(getSupportFragmentManager(), "whitelist");
+    }
 }

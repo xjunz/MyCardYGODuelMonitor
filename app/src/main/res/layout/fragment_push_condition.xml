@@ -146,7 +146,7 @@
 
         <Button
             android:id="@+id/btn_ok"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            style="@style/Widget.AppCompat.Button.Flat.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_unit"
@@ -160,7 +160,7 @@
 
         <Button
             android:id="@+id/btn_cancel"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/spacing_unit"

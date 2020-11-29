@@ -5,6 +5,7 @@
 
 <resources>
     <style name="Theme.Base" >
+        <item name="colorControlHighlight">@color/semi_teal_200</item>
         <item name="android:navigationBarColor">?colorPrimary</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>

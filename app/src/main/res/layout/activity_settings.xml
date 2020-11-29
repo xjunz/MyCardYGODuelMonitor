@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) xjunz 2020.
   -->
 
@@ -20,9 +19,9 @@
 
     <ScrollView
         android:id="@+id/root"
+        style="@style/CustomVerticalScrollbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbarThumbVertical="@drawable/bg_scrollbar_thumb"
         tools:context=".ui.SettingsActivity">
 
         <LinearLayout
@@ -153,6 +152,46 @@
                     app:layout_constraintStart_toStartOf="@+id/tv_title_condition"
                     app:layout_constraintTop_toBottomOf="@+id/tv_title_condition"
                     tools:text="当玩家一排名小于100且玩家二排名小于100" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_selectable"
+                android:clickable="true"
+                android:elevation="@dimen/z_item"
+                android:focusable="true"
+                android:onClick="configWhitelist">
+
+                <TextView
+                    android:id="@+id/tv_title_whitelist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_normal"
+                    android:layout_marginTop="@dimen/spacing_normal"
+                    android:text="@string/whitelist"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_unit"
+                    android:layout_marginEnd="@dimen/spacing_normal"
+                    android:layout_marginBottom="@dimen/spacing_normal"
+                    android:text="@string/help_white_list"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/tv_title_whitelist"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_title_whitelist" />
 
                 <View
                     android:layout_width="match_parent"
