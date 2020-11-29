@@ -4,5 +4,5 @@
 # 图标设计来源:<br/>
 <img src="https://p.ocgsoft.cn/97.jpg" /> <br/>
 # 特别感谢
-<a href="mycard.moe">萌卡</a>及其官方人员对本应用的支持<br/>
+<a href="https://mycard.moe">萌卡</a>及其官方人员对本应用的支持<br/>
 YGO Mobile
