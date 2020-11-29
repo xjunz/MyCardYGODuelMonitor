@@ -185,7 +185,7 @@ public class WatchService extends Service {
                     public void onFinish() {
                         mCountDownTimers.remove(this);
                         if (mDuels.contains(duel)) {
-                            String whiteListedPlayer = App.config().enableWhitelist.getValue() ? duel.getPlayerName(App.config().isWhitelisted(duel)) : null;
+                            String whiteListedPlayer = duel.getPlayerName(App.config().isWhitelisted(duel));
                             notifyDuel(duel, buildWatchNotification(
                                     whiteListedPlayer == null ? getString(R.string.delayed_notification_title, min) : getString(R.string.whitelisted_delayed_notification_title, whiteListedPlayer, min)
                                     , buildNotificationContent(duel), duel));
@@ -474,7 +474,6 @@ public class WatchService extends Service {
                         emitter.onNext(new Pair<>(event, duel));
                         loadPlayerRank(duel, true);
                         //检查是否有白名单玩家
-                        if (App.config().enableWhitelist.getValue()) {
                             String whitelisted = duel.getPlayerName(App.config().isWhitelisted(duel));
                             if (whitelisted != null) {
                                 int delay = App.config().pushDelayMin.getValue();
@@ -484,7 +483,6 @@ public class WatchService extends Service {
                                     notifyDuel(duel, buildWatchNotification(getString(R.string.whitelisted_def_notification_title, whitelisted),
                                             buildNotificationContent(duel), duel));
                                 }
-                            }
                         }
                         break;
                 }
