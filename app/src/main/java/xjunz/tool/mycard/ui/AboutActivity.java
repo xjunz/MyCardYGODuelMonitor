@@ -99,7 +99,7 @@ public class AboutActivity extends AppCompatActivity {
                     MasterToast.shortToast(R.string.check_update_failed);
                     return;
                 }
-                if (!App.getVersionName().equals(info.getVersionShort())) {
+                if (App.getVersionCode() < info.getBuild()) {
                     mBinding.updateBadge.setVisibility(View.VISIBLE);
                     App.setHasUpdate(true);
                     new AlertDialog.Builder(AboutActivity.this)

@@ -15,7 +15,7 @@ public class UpdateInfo {
     @SerializedName("binary")
     private Binary mBinary;
     @SerializedName("build")
-    private String mBuild;
+    private int mBuild;
     @SerializedName("changelog")
     private String mChangelog;
     @SerializedName("installUrl")
@@ -37,11 +37,11 @@ public class UpdateInfo {
         mBinary = binary;
     }
 
-    public String getBuild() {
+    public int getBuild() {
         return mBuild;
     }
 
-    public void setBuild(String build) {
+    public void setBuild(int build) {
         mBuild = build;
     }
 

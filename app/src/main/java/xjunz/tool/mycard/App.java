@@ -6,6 +6,7 @@ package xjunz.tool.mycard;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
 import androidx.annotation.NonNull;
@@ -25,8 +26,7 @@ public class App extends Application {
     private static Settings sSettings;
     private static Context sApplicationContext;
     private static boolean sIsYGOMobileInstalled;
-
-
+    private static int sVersionCode;
     private static boolean sHasUpdate;
     private static String sVersionName;
 
@@ -40,6 +40,10 @@ public class App extends Application {
 
     public static String getVersionName() {
         return sVersionName;
+    }
+
+    public static int getVersionCode() {
+        return sVersionCode;
     }
 
     public static void setHasUpdate(boolean sHasUpdate) {
@@ -62,7 +66,9 @@ public class App extends Application {
             sIsYGOMobileInstalled = false;
         }
         try {
-            sVersionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+            sVersionName = info.versionName;
+            sVersionCode = info.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -78,7 +84,7 @@ public class App extends Application {
                 super.onResponse(call, response);
                 UpdateInfo info = response.body();
                 if (info != null) {
-                    if (!sVersionName.equals(info.getVersionShort())) {
+                    if (sVersionCode < info.getBuild()) {
                         sHasUpdate = true;
                     }
                 }

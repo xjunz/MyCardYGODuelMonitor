@@ -437,6 +437,12 @@ public class WatchService extends Service {
                             return;
                         }
                         String id = jobj.getString("data");
+                        for (int i = 0; i < mDuels.size(); i++) {
+                            if (mDuels.get(i).getId().equals(id)) {
+                                mDuels.remove(i);
+                                break;
+                            }
+                        }
                         if (id.equals(mCurrentWhiteHotDuelId)) {
                             mCurrentWhiteHotDuelId = null;
                         }
@@ -474,15 +480,15 @@ public class WatchService extends Service {
                         emitter.onNext(new Pair<>(event, duel));
                         loadPlayerRank(duel, true);
                         //检查是否有白名单玩家
-                            String whitelisted = duel.getPlayerName(App.config().isWhitelisted(duel));
-                            if (whitelisted != null) {
-                                int delay = App.config().pushDelayMin.getValue();
-                                if (delay > 0) {
-                                    beginDelayPush(delay, duel);
-                                } else {
-                                    notifyDuel(duel, buildWatchNotification(getString(R.string.whitelisted_def_notification_title, whitelisted),
-                                            buildNotificationContent(duel), duel));
-                                }
+                        String whitelisted = duel.getPlayerName(App.config().isWhitelisted(duel));
+                        if (whitelisted != null) {
+                            int delay = App.config().pushDelayMin.getValue();
+                            if (delay > 0) {
+                                beginDelayPush(delay, duel);
+                            } else {
+                                notifyDuel(duel, buildWatchNotification(getString(R.string.whitelisted_def_notification_title, whitelisted),
+                                        buildNotificationContent(duel), duel));
+                            }
                         }
                         break;
                 }
