@@ -170,7 +170,7 @@ public class WatchService extends Service {
     private void beginDelayPush(int min, Duel duel) {
         Completable.create(new CompletableOnSubscribe() {
             @Override
-            public void subscribe(@io.reactivex.annotations.NonNull CompletableEmitter emitter) throws Exception {
+            public void subscribe(@io.reactivex.annotations.NonNull CompletableEmitter emitter) {
                 //timer要在main thread中创建[Handler.java:227]
                 CountDownTimer timer = new CountDownTimer(min * 60 * 1000, 100) {
                     @Override
@@ -387,7 +387,9 @@ public class WatchService extends Service {
                     mDuelCallback.onPlayerRankGot(duel);
                 }
                 if (shouldNotify) {
-                    if (App.config().isDuelInPushCondition(duel)) {
+                    //只推非白名单对局
+                    //因为白名单对局在onMessage里已经推过了
+                    if (App.config().isDuelInPushCondition(duel) && App.config().isWhitelisted(duel) <= 0) {
                         int delay = App.config().pushDelayMin.getValue();
                         if (delay > 0) {
                             beginDelayPush(delay, duel);

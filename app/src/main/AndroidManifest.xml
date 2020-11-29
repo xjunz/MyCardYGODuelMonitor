@@ -21,7 +21,8 @@
         android:theme="@style/Theme.Base">
         <activity
             android:name="xjunz.tool.mycard.ui.MainActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -30,15 +31,18 @@
         <activity
             android:name="xjunz.tool.mycard.ui.WatchSetupActivity"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Base.Translucent"
             android:windowSoftInputMode="adjustUnspecified" />
         <activity
             android:name="xjunz.tool.mycard.ui.SettingsActivity"
             android:label="@string/settings"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Base" />
         <activity
             android:name=".ui.AboutActivity"
             android:label="@string/about"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Base" />
 
         <service android:name="xjunz.tool.mycard.WatchService" />
