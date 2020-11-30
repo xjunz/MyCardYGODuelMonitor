@@ -11,7 +11,7 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:colorEdgeEffect">?colorAccent</item>
         <item name="android:alertDialogTheme">@style/Theme.Alert</item>
-        <item name="colorButtonNormal">?colorAccent</item>
+        <item name="colorButtonNormal">@color/color_button_normal</item>
         <item name="colorControlNormal">?colorAccent</item>
     </style>
 

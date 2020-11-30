@@ -8,18 +8,13 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.transition.Transition;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -37,50 +32,15 @@ import xjunz.tool.mycard.ui.MasterToast;
 
 public class Utils {
 
-    @Nullable
-    public static String fetchAsStringFromURL(String urlStr) {
-        try {
-            URL url = new URL(urlStr);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-            InputStream in = connection.getInputStream();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int count;
-            while ((count = in.read(buffer, 0, buffer.length)) != -1) {
-                out.write(buffer, 0, count);
-            }
-            out.flush();
-            in.close();
-            out.close();
-            return out.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 
     public static void launchWatch(@NonNull Context context, String roomId) {
         if (App.isYGOMobileInstalled()) {
-            context.startActivity(buildLaunchWatchIntent(App.config().username.getValue(), App.config().token.getValue(), roomId));
+            context.startActivity(buildLaunchWatchIntent(App.config().username.getValue(), App.getWatchToken(), roomId));
         } else {
             MasterToast.shortToast(R.string.start_watch_failed);
         }
     }
 
-    public static void launchWatch(@NonNull Context context, String watchAs, String token, String roomId) {
-        if (App.isYGOMobileInstalled()) {
-            context.startActivity(buildLaunchWatchIntent(watchAs, token, roomId));
-        } else {
-            MasterToast.shortToast(R.string.start_watch_failed);
-        }
-    }
-
-    public static Intent buildLaunchWatchIntent(String roomId) {
-        return buildLaunchWatchIntent(App.config().username.getValue(), App.config().token.getValue(), roomId);
-    }
 
     @NonNull
     public static Intent buildLaunchWatchIntent(String watchAs, String token, String roomId) {
@@ -112,7 +72,7 @@ public class Utils {
     public static Retrofit createRetrofit() {
         OkHttpClient client = new OkHttpClient.Builder().build();
         return new Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
+                .baseUrl(Constants.BASE_API_ARENA)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
@@ -122,7 +82,7 @@ public class Utils {
     public static Retrofit createRetrofit(int timeoutSecs) {
         OkHttpClient client = new OkHttpClient.Builder().callTimeout(timeoutSecs, TimeUnit.SECONDS).readTimeout(timeoutSecs, TimeUnit.SECONDS).build();
         return new Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
+                .baseUrl(Constants.BASE_API_ARENA)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
@@ -147,6 +107,33 @@ public class Utils {
         }
 
         public void onWhatever() {
+
+        }
+    }
+
+    public static class TransitionListenerAdapter implements Transition.TransitionListener {
+        @Override
+        public void onTransitionStart(Transition transition) {
+
+        }
+
+        @Override
+        public void onTransitionEnd(Transition transition) {
+
+        }
+
+        @Override
+        public void onTransitionCancel(Transition transition) {
+
+        }
+
+        @Override
+        public void onTransitionPause(Transition transition) {
+
+        }
+
+        @Override
+        public void onTransitionResume(Transition transition) {
 
         }
     }

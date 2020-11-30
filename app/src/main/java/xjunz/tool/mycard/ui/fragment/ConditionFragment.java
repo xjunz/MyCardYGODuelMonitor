@@ -39,10 +39,10 @@ public class ConditionFragment extends DialogFragment {
         return src.length() == 0 ? 0 : src;
     }
 
-    public void confirm(String p1r1, String p1r2, String p2r1, String p2r2, int checkedId) {
+    public void confirm(String p1r1, String p1r2, String p2r1, String p2r2, boolean and) {
         App.config().player1RankLimit.setValue(check(p1r1) + "," + check(p1r2));
         App.config().player2RankLimit.setValue(check(p2r1) + "," + check(p2r2));
-        App.config().isConditionAnd.setValue(checkedId == R.id.rb_and);
+        App.config().isConditionAnd.setValue(and);
         dismiss();
     }
 

@@ -52,15 +52,12 @@ import xjunz.tool.mycard.api.Constants;
 import xjunz.tool.mycard.api.LoadPlayerInfoService;
 import xjunz.tool.mycard.api.bean.Duel;
 import xjunz.tool.mycard.api.bean.Player;
+import xjunz.tool.mycard.ui.LoginActivity;
 import xjunz.tool.mycard.ui.MainActivity;
-import xjunz.tool.mycard.ui.WatchSetupActivity;
 import xjunz.tool.mycard.util.Utils;
 
 public class WatchService extends Service {
 
-    /**
-     * 观战信息WSS URL
-     */
     private List<Duel> mDuels;
     private WebSocketClient mClient;
     public static final int STATUS_CLOSED = -1;
@@ -103,8 +100,7 @@ public class WatchService extends Service {
                 if (candidate != null) {
                     mCurrentWhiteHotDuelId = candidate.getId();
                     notifyDuel(candidate, buildWatchNotification(getString(R.string.new_white_hot)
-                            , Html.fromHtml(getResources().getString(R.string.def_notification_content, candidate.getPlayer1Rank(), candidate.getPlayer1Name(), candidate.getPlayer2Rank(), candidate.getPlayer2Name()))
-                            , candidate));
+                            , buildNotificationContent(candidate), candidate));
                 }
             }
         }
@@ -213,14 +209,9 @@ public class WatchService extends Service {
         return builder.build();
     }
 
-    private Notification buildWatchNotification(CharSequence title, CharSequence content, Duel duel) {
-        Intent intent;
-        if (!App.config().hasCompleteWatchConfig() || !App.isYGOMobileInstalled()) {
-            intent = new Intent(this, WatchSetupActivity.class);
-            intent.putExtra(WatchSetupActivity.EXTRA_DUEL_ID, duel.getId());
-        } else {
-            intent = Utils.buildLaunchWatchIntent(duel.getId());
-        }
+    private Notification buildWatchNotification(CharSequence title, CharSequence content, @NonNull Duel duel) {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra(LoginActivity.EXTRA_DUEL_ID, duel.getId());
         PendingIntent pendingIntent = PendingIntent.getActivity(this, mDuelNotificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder builder = new Notification.Builder(this.getApplicationContext());
         long timestamp = System.currentTimeMillis();
@@ -448,7 +439,6 @@ public class WatchService extends Service {
                         }
                         //取消通知
                         if (mNotifiedDuels.containsKey(id)) {
-                            //noinspection ConstantConditions
                             mNotificationManager.cancel(mNotifiedDuels.get(id));
                             mNotifiedDuels.remove(id);
                         }

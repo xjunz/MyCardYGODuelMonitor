@@ -24,7 +24,7 @@ import static xjunz.tool.mycard.App.getStringOf;
 public class Settings {
     private final SharedPreferences mSP;
     public StringSetting username = new StringSetting("username", null);
-    public StringSetting token = new StringSetting("token", null);
+    public IntegerSetting id = new IntegerSetting("id", -1);
     public StringSetting player1RankLimit = new StringSetting("player1_rank_limit", "0,100");
     public StringSetting player2RankLimit = new StringSetting("player2_rank_limit", "0,100");
     public BooleanSetting isConditionAnd = new BooleanSetting("is_and", false);
@@ -34,6 +34,7 @@ public class Settings {
     public IntegerSetting duelRankLoadRetryTimes = new IntegerSetting("duel_rank_load_retry_times", 3);
     public IntegerSetting rankingListLoadTimeout = new IntegerSetting("ranking_list_load_timeout", 10);
     public BooleanSetting notifyInSingleId = new BooleanSetting("notify_in_single_id", true);
+    public BooleanSetting enableConditionedPush = new BooleanSetting("enable_conditioned_push", true);
     public BooleanSetting reconnectWhenClosedRemotely = new BooleanSetting("reconnect_when_closed_remotely", false);
     public BooleanSetting enableWhitelist = new BooleanSetting("enable_whitelist", true);
     public StringSetSetting pushWhiteList = new StringSetSetting("push_whitelist", null);
@@ -70,6 +71,11 @@ public class Settings {
         return 0;
     }
 
+    public void logOut() {
+        id.restoreDefault();
+        username.restoreDefault();
+    }
+
     public ObservableField<String> getPushConditionText() {
         String player1 = getConditionString(1, getPlayer1RankRange());
         String player2 = getConditionString(2, getPlayer2RankRange());
@@ -92,6 +98,9 @@ public class Settings {
     }
 
     public boolean isDuelInPushCondition(@NonNull Duel duel) {
+        if (!enableConditionedPush.getValue()) {
+            return false;
+        }
         int[] limit1 = getPlayer1RankRange();
         int[] limit2 = getPlayer2RankRange();
         boolean a = (limit1[0] == 0 && limit1[1] == 0) || (duel.getPlayer1Rank() > 0 && ((limit1[0] == 0 || duel.getPlayer1Rank() >= limit1[0]) && (limit1[1] == 0 || duel.getPlayer1Rank() <= limit1[1])));
@@ -109,8 +118,8 @@ public class Settings {
         return new int[]{Integer.parseInt(condition[0]), Integer.parseInt(condition[1])};
     }
 
-    public boolean hasCompleteWatchConfig() {
-        return username.getValue() != null && token.getValue() != null;
+    public boolean hasLoggedIn() {
+        return username.getValue() != null && id.getValue() != -1;
     }
 
     public static abstract class Setting<T> extends BaseObservable {

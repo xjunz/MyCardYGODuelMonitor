@@ -20,6 +20,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import xjunz.tool.mycard.api.CheckUpdateService;
 import xjunz.tool.mycard.api.Constants;
 import xjunz.tool.mycard.api.bean.UpdateInfo;
+import xjunz.tool.mycard.util.TokenGenerator;
 import xjunz.tool.mycard.util.Utils;
 
 public class App extends Application {
@@ -29,6 +30,7 @@ public class App extends Application {
     private static int sVersionCode;
     private static boolean sHasUpdate;
     private static String sVersionName;
+    private static String sWatchToken;
 
     public static Context getContext() {
         return sApplicationContext;
@@ -54,6 +56,15 @@ public class App extends Application {
         return sHasUpdate;
     }
 
+
+    public static String getWatchToken() {
+        return sWatchToken;
+    }
+
+    public static void setWatchToken(String watchToken) {
+        App.sWatchToken = watchToken;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -71,6 +82,9 @@ public class App extends Application {
             sVersionCode = info.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
+        }
+        if (config().id.getValue() != -1) {
+            setWatchToken(TokenGenerator.generate(config().id.getValue()));
         }
         OkHttpClient client = new OkHttpClient.Builder().build();
         CheckUpdateService checkUpdateService = new Retrofit.Builder()

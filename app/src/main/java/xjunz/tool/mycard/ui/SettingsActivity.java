@@ -5,6 +5,7 @@
 package xjunz.tool.mycard.ui;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -28,7 +29,6 @@ import xjunz.tool.mycard.ui.fragment.InputFragment;
 import xjunz.tool.mycard.ui.fragment.WhitelistFragment;
 
 public class SettingsActivity extends AppCompatActivity {
-    private ActivitySettingsBinding mBinding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,43 +45,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void helpReconnect() {
         new AlertDialog.Builder(this).setTitle(R.string.help).setMessage(R.string.help_connect).show();
-    }
-
-    public void configToken() {
-        new InputFragment().setCallback(new InputFragment.Callback() {
-            @Override
-            public void onConfirmed(String inputText) {
-                if (TextUtils.isEmpty(inputText)) {
-                    App.config().token.setValue(null);
-                } else {
-                    App.config().token.setValue(inputText);
-                }
-            }
-
-            @Override
-            public boolean illegalInput(String input) {
-                return input.length() > 0 && input.length() != 8;
-            }
-
-            @Override
-            public String getIllegalInputToastText() {
-                return getString(R.string.token_over_length);
-            }
-        }).setTitle(getString(R.string.watch_token)).show(getSupportFragmentManager(), "token");
-    }
-
-
-    public void configUsername() {
-        new InputFragment().setCallback(new InputFragment.Callback() {
-            @Override
-            public void onConfirmed(String inputText) {
-                if (TextUtils.isEmpty(inputText)) {
-                    App.config().username.restoreDefault();
-                } else {
-                    App.config().username.setValue(inputText);
-                }
-            }
-        }).setTitle(getString(R.string.username)).show(getSupportFragmentManager(), "username");
     }
 
     public void configPushCondition(View view) {
@@ -130,7 +93,12 @@ public class SettingsActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(inputText)) {
                     App.config().rankingListLoadTimeout.restoreDefault();
                 } else {
-                    App.config().rankingListLoadTimeout.setValue(Integer.parseInt(inputText));
+                    int timeout = Integer.parseInt(inputText);
+                    if (timeout == 0) {
+                        App.config().rankingListLoadTimeout.restoreDefault();
+                    } else {
+                        App.config().rankingListLoadTimeout.setValue(timeout);
+                    }
                 }
             }
 
@@ -152,7 +120,12 @@ public class SettingsActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(inputText)) {
                     App.config().duelRankLoadTimeout.restoreDefault();
                 } else {
-                    App.config().duelRankLoadTimeout.setValue(Integer.parseInt(inputText));
+                    int timeout = Integer.parseInt(inputText);
+                    if (timeout == 0) {
+                        App.config().duelRankLoadTimeout.restoreDefault();
+                    } else {
+                        App.config().duelRankLoadTimeout.setValue(timeout);
+                    }
                 }
             }
 
@@ -189,5 +162,22 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void configWhitelist(View view) {
         new WhitelistFragment().show(getSupportFragmentManager(), "whitelist");
+    }
+
+    public void logInOrOut(View view) {
+        if (App.config().hasLoggedIn()) {
+            App.config().logOut();
+        } else {
+            startActivity(new Intent(this, LoginActivity.class));
+        }
+    }
+
+    public void logInOrOutConfirm(View view) {
+        if (App.config().hasLoggedIn()) {
+            new AlertDialog.Builder(this).setTitle(R.string.alert).setMessage(R.string.alert_log_out)
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> App.config().logOut()).setNegativeButton(android.R.string.cancel, null).show();
+        } else {
+            startActivity(new Intent(this, LoginActivity.class));
+        }
     }
 }

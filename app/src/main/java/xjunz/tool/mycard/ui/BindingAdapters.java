@@ -8,6 +8,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.text.InputFilter;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AnticipateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.EditText;
@@ -17,6 +18,9 @@ import androidx.core.view.ViewCompat;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.InverseBindingAdapter;
 import androidx.databinding.InverseBindingListener;
+
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class BindingAdapters {
     @BindingAdapter("android:maxTextCount")
@@ -66,10 +70,22 @@ public class BindingAdapters {
     }
 
     @BindingAdapter("android:gone")
-    public static void setGone(View view, boolean gone) {
+    public static void setGone(@NonNull View view, boolean gone) {
         view.setVisibility(gone ? View.GONE : View.VISIBLE);
     }
 
+    @BindingAdapter("android:widthWrap")
+    public static void setWrapWidth(@NonNull View view, Boolean oldValue, Boolean wrap) {
+        if (oldValue != null) {
+            ViewGroup.LayoutParams lp = view.getLayoutParams();
+            if (wrap) {
+                lp.width = WRAP_CONTENT;
+            } else {
+                lp.width = MATCH_PARENT;
+            }
+            view.setLayoutParams(lp);
+        }
+    }
 
     @InverseBindingAdapter(attribute = "android:height")
     public static int getHeight(@NonNull View view) {

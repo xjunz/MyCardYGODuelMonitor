@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="host"
+            type="xjunz.tool.mycard.ui.LoginActivity" />
+
+        <variable
+            name="loading"
+            type="androidx.databinding.ObservableBoolean" />
+
+        <variable
+            name="wait"
+            type="androidx.databinding.ObservableInt" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/spacing_large"
+        android:background="@drawable/bg_dialog"
+        android:elevation="@dimen/z_dialog"
+        android:scrollbarThumbVertical="@drawable/bg_scrollbar_thumb"
+        android:scrollbars="vertical"
+        android:widthWrap="@{loading}">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginEnd="16dp"
+                android:text="@{loading?@string/logining:@string/title_login}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_des"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_unit"
+                android:gone="@{loading}"
+                android:text="@string/des_login"
+                app:layout_constraintEnd_toEndOf="@+id/et_pwd"
+                app:layout_constraintStart_toStartOf="@+id/tv_title"
+                app:layout_constraintTop_toBottomOf="@+id/et_pwd" />
+
+            <EditText
+                android:id="@+id/et_username"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_normal"
+                android:layout_marginTop="@dimen/spacing_unit"
+                android:autofillHints="name,userName"
+                android:gone="@{loading}"
+                android:hint="@string/hint_set_username"
+                android:inputType="textPersonName"
+                android:maxTextCount="@{20}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+
+            <EditText
+                android:id="@+id/et_pwd"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_unit"
+                android:gone="@{loading}"
+                android:hint="@string/hint_pwd"
+                android:importantForAutofill="no"
+                android:inputType="textVisiblePassword"
+                android:maxTextCount="@{20}"
+                app:layout_constraintEnd_toEndOf="@+id/et_username"
+                app:layout_constraintStart_toStartOf="@+id/tv_title"
+                app:layout_constraintTop_toBottomOf="@+id/et_username" />
+
+            <Button
+                android:id="@+id/btn_login"
+                style="@style/Widget.AppCompat.Button.Flat.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="@dimen/spacing_unit"
+                android:layout_marginBottom="@dimen/spacing_unit"
+                android:enabled="@{wait==0}"
+                android:gone="@{loading}"
+                android:onClick="@{()->host.login(etUsername.getText().toString,etPwd.getText().toString)}"
+                android:text="@{wait==0?@string/login:@string/pls_wait_for(wait)}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_des" />
+
+            <Button
+                android:id="@+id/btn_cancel"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gone="@{loading}"
+                android:onClick="@{()->host.finishAfterTransition()}"
+                android:text="@android:string/cancel"
+                app:layout_constraintBottom_toBottomOf="@+id/btn_login"
+                app:layout_constraintEnd_toStartOf="@+id/btn_login"
+                app:layout_constraintTop_toTopOf="@+id/btn_login" />
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="@dimen/progress_width"
+                android:layout_height="wrap_content"
+                android:layout_margin="32dp"
+                android:gone="@{!loading}"
+                android:indeterminate="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</layout>

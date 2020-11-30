@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/spacing_unit"
                 android:layout_marginStart="@dimen/spacing_normal"
-                android:text="@string/watch"
+                android:text="@string/user"
                 android:textColor="?colorAccent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,7 +44,7 @@
                 android:clickable="true"
                 android:elevation="@dimen/z_item"
                 android:focusable="true"
-                android:onClick="@{()->activity.configUsername()}">
+                android:onClick="logInOrOutConfirm">
 
                 <TextView
                     android:id="@+id/tv_title_developer"
@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/spacing_normal"
                     android:layout_marginTop="@dimen/spacing_normal"
-                    android:text="@string/watch_username"
+                    android:text="@{settings.id.value==-1?@string/not_login:@string/already_login}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -63,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_unit"
                     android:layout_marginBottom="@dimen/spacing_normal"
-                    android:text="@{settings.username.value??@string/bracketed_unset}"
+                    android:text="@{settings.username.value??@string/tap_to_login}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/tv_title_developer"
                     app:layout_constraintTop_toBottomOf="@+id/tv_title_developer"
@@ -75,40 +75,17 @@
                     android:background="?android:attr/listDivider"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_selectable"
-                android:clickable="true"
-                android:elevation="@dimen/z_item"
-                android:focusable="true"
-                android:onClick="@{()->activity.configToken()}">
-
-                <TextView
-                    android:id="@+id/tv_title_token"
+                <Button
+                    style="@style/Widget.AppCompat.Button.Flat.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/spacing_normal"
-                    android:layout_marginTop="@dimen/spacing_normal"
-                    android:text="@string/watch_token"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_token"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_unit"
-                    android:layout_marginBottom="@dimen/spacing_normal"
-                    android:text="@{settings.token.value??@string/bracketed_unset}"
+                    android:layout_marginEnd="8dp"
+                    android:onClick="logInOrOut"
+                    android:text="@{settings.id.value==-1?@string/login:@string/log_out}"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/tv_title_token"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_title_token"
-                    tools:text="token" />
-
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView

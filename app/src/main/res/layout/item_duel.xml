@@ -1,93 +1,145 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) xjunz 2020.
   -->
+<layout>
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
-    android:paddingHorizontal="@dimen/spacing_unit">
+    <data>
 
-    <TextView
-        android:id="@+id/tv_player_1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/spacing_unit"
-        android:layout_marginTop="@dimen/spacing_normal"
-        android:layout_marginEnd="@dimen/spacing_unit"
-        android:layout_marginBottom="@dimen/spacing_normal"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/tv_rank_1"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="@tools:sample/full_names" />
+        <variable
+            name="whitelisted"
+            type="int" />
 
-    <TextView
-        android:id="@+id/tv_rank_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/spacing_normal"
-        android:background="@drawable/bg_framed_text"
-        android:paddingHorizontal="4dp"
-        android:paddingVertical="@dimen/z_item"
-        android:text="@string/loading"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_player_1"
-        app:layout_constraintEnd_toStartOf="@+id/vs"
-        app:layout_constraintTop_toTopOf="@+id/tv_player_1" />
+        <variable
+            name="focused"
+            type="boolean" />
 
-    <TextView
-        android:id="@+id/tv_player_2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/spacing_normal"
-        android:layout_marginEnd="@dimen/spacing_unit"
-        android:ellipsize="end"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/tv_rank_2"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/vs"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="@tools:sample/full_names" />
+        <variable
+            name="duel"
+            type="xjunz.tool.mycard.api.bean.Duel" />
+    </data>
 
-    <TextView
-        android:id="@+id/vs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/vs"
-        android:textStyle="bold|italic"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tv_rank_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/spacing_normal"
-        android:background="@drawable/bg_framed_text"
-        android:paddingHorizontal="4dp"
-        android:paddingVertical="@dimen/z_item"
-        android:text="@string/loading"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_player_2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_player_2" />
-
-    <View
-        android:id="@+id/divider"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="?android:attr/listDivider"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="@{whitelisted>0?@drawable/bg_whitelisted:focused?@drawable/bg_focused:null}"
+        android:paddingHorizontal="@dimen/spacing_unit">
+
+        <TextView
+            android:id="@+id/tv_player_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_unit"
+            android:layout_marginTop="@dimen/spacing_normal"
+            android:layout_marginEnd="@dimen/spacing_unit"
+            android:layout_marginBottom="@dimen/spacing_normal"
+            android:text="@{duel.player1Name}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tv_tag_1"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@tools:sample/full_names" />
+
+        <TextView
+            android:id="@+id/tv_rank_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/spacing_normal"
+            android:background="@drawable/bg_framed_text"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="@dimen/z_item"
+            android:text="@{duel.player1Rank>0?String.valueOf(duel.player1Rank):duel.player1Rank&lt;0?@string/loading:@string/unknown}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_player_1"
+            app:layout_constraintEnd_toStartOf="@+id/vs"
+            app:layout_constraintTop_toTopOf="@+id/tv_player_1" />
+
+        <TextView
+            android:id="@+id/tv_tag_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_framed_text"
+            android:gone="@{whitelisted!=1}"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="@dimen/z_item"
+            android:text="@string/whitelisted"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_player_1"
+            app:layout_constraintEnd_toStartOf="@+id/tv_rank_1"
+            app:layout_constraintTop_toTopOf="@+id/tv_player_1" />
+
+        <TextView
+            android:id="@+id/tv_player_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_normal"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="@dimen/spacing_unit"
+            android:layout_marginBottom="16dp"
+            android:ellipsize="end"
+            android:text="@{duel.player2Name}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tv_tag_2"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/vs"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@tools:sample/full_names" />
+
+        <TextView
+            android:id="@+id/vs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/vs"
+            android:textStyle="bold|italic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_rank_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/spacing_normal"
+            android:background="@drawable/bg_framed_text"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="@dimen/z_item"
+            android:text="@{duel.player2Rank>0?String.valueOf(duel.player2Rank):duel.player2Rank&lt;0?@string/loading:@string/unknown}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_player_2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tv_player_2" />
+
+        <TextView
+            android:id="@+id/tv_tag_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_framed_text"
+            android:gone="@{whitelisted!=2}"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="@dimen/z_item"
+            android:text="@string/whitelisted"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_player_2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tv_rank_2"
+            app:layout_constraintTop_toTopOf="@+id/tv_player_2" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

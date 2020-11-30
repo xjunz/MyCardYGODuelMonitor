@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) xjunz 2020.
   -->
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -16,7 +16,7 @@
             type="xjunz.tool.mycard.Settings" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -27,15 +27,27 @@
             android:layout_marginTop="24dp"
             android:text="@string/player1_rank"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            app:layout_constraintEnd_toStartOf="@+id/space1"
             app:layout_constraintStart_toStartOf="@+id/p1r1"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Space
-            android:id="@+id/space"
+            android:id="@+id/space1"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.36"
+            app:layout_constraintStart_toEndOf="@+id/textView3"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Space
+            android:id="@+id/space2"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.72"
             app:layout_constraintStart_toEndOf="@+id/textView3"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -45,7 +57,8 @@
             android:layout_height="wrap_content"
             android:text="@string/player2_rank"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            app:layout_constraintStart_toEndOf="@+id/space"
+            app:layout_constraintEnd_toStartOf="@+id/space2"
+            app:layout_constraintStart_toEndOf="@+id/space1"
             app:layout_constraintTop_toTopOf="@+id/textView" />
 
         <TextView
@@ -60,12 +73,10 @@
 
         <EditText
             android:id="@+id/p1r1"
-            android:text="@{String.valueOf(settings.player1RankRange[0])}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_unit"
             android:layout_marginTop="@dimen/spacing_unit"
-            android:layout_marginEnd="@dimen/spacing_normal"
             android:digits="0,1,2,3,4,5,6,7,8,9"
             android:ems="10"
             android:hint="@string/hint_rank"
@@ -73,8 +84,9 @@
             android:inputType="number"
             android:maxTextCount="@{7}"
             android:singleLine="true"
+            android:text="@{String.valueOf(settings.player1RankRange[0])}"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            app:layout_constraintEnd_toStartOf="@+id/space"
+            app:layout_constraintEnd_toStartOf="@+id/space1"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/textView3"
             app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -91,7 +103,6 @@
 
         <EditText
             android:id="@+id/p1r2"
-            android:text="@{String.valueOf(settings.player1RankRange[1])}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_normal"
@@ -102,6 +113,7 @@
             android:inputType="number"
             android:maxTextCount="@{7}"
             android:singleLine="true"
+            android:text="@{String.valueOf(settings.player1RankRange[1])}"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             app:layout_constraintEnd_toEndOf="@+id/p1r1"
             app:layout_constraintStart_toEndOf="@+id/textView3"
@@ -110,10 +122,8 @@
 
         <EditText
             android:id="@+id/p2r1"
-            android:text="@{String.valueOf(settings.player2RankRange[0])}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/spacing_normal"
             android:digits="0,1,2,3,4,5,6,7,8,9"
             android:ems="10"
             android:hint="@string/hint_rank"
@@ -121,17 +131,16 @@
             android:inputType="number"
             android:maxTextCount="@{7}"
             android:singleLine="true"
+            android:text="@{String.valueOf(settings.player2RankRange[0])}"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/space"
+            app:layout_constraintEnd_toStartOf="@+id/space2"
+            app:layout_constraintStart_toEndOf="@+id/space1"
             app:layout_constraintTop_toTopOf="@+id/p1r1" />
 
         <EditText
             android:id="@+id/p2r2"
-            android:text="@{String.valueOf(settings.player2RankRange[1])}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/spacing_normal"
             android:digits="0,1,2,3,4,5,6,7,8,9"
             android:ems="10"
             android:hint="@string/hint_rank"
@@ -139,8 +148,9 @@
             android:inputType="number"
             android:maxTextCount="@{7}"
             android:singleLine="true"
+            android:text="@{String.valueOf(settings.player2RankRange[1])}"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/p2r1"
             app:layout_constraintStart_toStartOf="@+id/p2r1"
             app:layout_constraintTop_toTopOf="@+id/p1r2" />
 
@@ -152,7 +162,7 @@
             android:layout_marginTop="@dimen/spacing_unit"
             android:layout_marginEnd="@dimen/spacing_unit"
             android:layout_marginBottom="@dimen/spacing_unit"
-            android:onClick="@{()->host.confirm(p1r1.getText().toString,p1r2.getText().toString,p2r1.getText().toString,p2r2.getText().toString,logic.getCheckedRadioButtonId())}"
+            android:onClick="@{()->host.confirm(p1r1.getText().toString,p1r2.getText().toString,p2r1.getText().toString,p2r2.getText().toString,rbAnd.isChecked())}"
             android:text="@android:string/ok"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -170,32 +180,48 @@
             app:layout_constraintEnd_toStartOf="@+id/btn_ok"
             app:layout_constraintTop_toTopOf="@+id/btn_ok" />
 
-        <RadioGroup
-            android:id="@+id/logic"
-            android:checkedButton="@{settings.isConditionAnd.value?@id/rb_and:@id/rb_or}"
-            android:layout_width="0dp"
+
+        <RadioButton
+            android:id="@+id/rb_and"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
+            android:checked="@={settings.isConditionAnd.value}"
+            android:text="@string/and"
+            app:layout_constraintBottom_toBottomOf="@+id/p2r2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/space2" />
+
+        <RadioButton
+            android:id="@+id/rb_or"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="@={!settings.isConditionAnd.value}"
+            android:text="@string/or"
+            app:layout_constraintBottom_toBottomOf="@+id/p2r1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/space2" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/logic"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            app:layout_constraintBottom_toBottomOf="@+id/textView2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/space2"
+            app:layout_constraintTop_toTopOf="@+id/textView2" />
+
+        <CheckBox
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:checked="@={settings.enableConditionedPush.value}"
+            android:text="@string/enable_or_not"
             app:layout_constraintBottom_toBottomOf="@+id/btn_cancel"
-            app:layout_constraintEnd_toStartOf="@+id/btn_cancel"
+            app:layout_constraintEnd_toStartOf="@+id/space1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/btn_cancel">
+            app:layout_constraintTop_toTopOf="@+id/btn_cancel" />
 
-            <RadioButton
-                android:id="@+id/rb_and"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/spacing_normal"
-                android:checked="true"
-                android:text="@string/and" />
-
-            <RadioButton
-                android:id="@+id/rb_or"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/spacing_normal"
-                android:text="@string/or" />
-        </RadioGroup>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

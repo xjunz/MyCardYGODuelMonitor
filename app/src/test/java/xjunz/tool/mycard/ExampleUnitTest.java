@@ -17,21 +17,5 @@ public class ExampleUnitTest {
 
     int id = 0;
 
-    @Test
-    public void var() {
-        run(id);
-        id += 1;
-    }
 
-    private void run(int id) {
-        new Thread(() -> {
-            try {
-                Thread.sleep(100);
-                System.out.println(id);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        }).start();
-    }
 }

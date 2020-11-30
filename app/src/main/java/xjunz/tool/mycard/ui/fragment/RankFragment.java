@@ -58,11 +58,13 @@ public class RankFragment extends Fragment {
 
     private Call<List<Player>> mLoadListCall;
 
+    private final List<Call<HistorySet>> mLoadTrendCall = new ArrayList<>();
+
     private void loadRankList() {
         if (mLoadListCall != null) {
             mLoadListCall.cancel();
         }
-        for (Call<HistorySet> call : mLoadDeckCalls) {
+        for (Call<HistorySet> call : mLoadTrendCall) {
             call.cancel();
         }
         mLoadListCall = Utils.createRetrofit(App.config().rankingListLoadTimeout.getValue()).create(LoadPlayerListService.class).loadPlayerList();
@@ -98,7 +100,7 @@ public class RankFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        for (Call<HistorySet> call : mLoadDeckCalls) {
+        for (Call<HistorySet> call : mLoadTrendCall) {
             call.cancel();
         }
         if (mLoadListCall != null) {
@@ -106,15 +108,13 @@ public class RankFragment extends Fragment {
         }
     }
 
-    private final List<Call<HistorySet>> mLoadDeckCalls = new ArrayList<>();
-
     private void loadDecksOf(@NonNull Player player) {
         String playerName = player.getUsername();
         if (mLoadHistoryService == null) {
             mLoadHistoryService = Utils.createRetrofit().create(LoadHistoryService.class);
         }
         Call<HistorySet> call = mLoadHistoryService.loadHistoryOf(playerName);
-        mLoadDeckCalls.add(call);
+        mLoadTrendCall.add(call);
         call.enqueue(new Utils.CallbackAdapter<HistorySet>() {
             @Override
             public void onResponse(@NonNull Call<HistorySet> call, @NonNull Response<HistorySet> response) {
@@ -125,7 +125,7 @@ public class RankFragment extends Fragment {
                 }
                 int index = mRankList.indexOf(player);
                 if (index >= 0) {
-                    mAdapter.notifyItemChanged(index);
+                    mAdapter.notifyItemChanged(index, true);
                 }
             }
 
@@ -137,7 +137,7 @@ public class RankFragment extends Fragment {
 
             @Override
             public void onWhatever() {
-                mLoadDeckCalls.remove(call);
+                mLoadTrendCall.remove(call);
             }
         });
     }
@@ -149,6 +149,30 @@ public class RankFragment extends Fragment {
         private RankAdapter() {
             colorAccent = Utils.getAttrColor(requireContext(), R.attr.colorAccent);
             colorTextSecondary = Utils.getAttrColor(requireContext(), android.R.attr.textColorSecondary);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position, @NonNull List<Object> payloads) {
+            if (payloads.size() > 0) {
+                Player player = mRankList.get(position);
+                if (player.getPtTrendIndex() != null) {
+                    holder.trend.setVisibility(View.VISIBLE);
+                    if (player.getPtTrendIndex() > 5) {
+                        holder.trend.setText("↑");
+                        holder.trend.setTextColor(colorAccent);
+                    } else if (player.getPtTrendIndex() < -5) {
+                        holder.trend.setText("↓");
+                        holder.trend.setTextColor(colorTextSecondary);
+                    } else {
+                        holder.trend.setText("—");
+                        holder.trend.setTextColor(colorTextSecondary);
+                    }
+                } else {
+                    holder.trend.setVisibility(View.GONE);
+                }
+            } else {
+                super.onBindViewHolder(holder, position, payloads);
+            }
         }
 
         @NonNull
@@ -165,21 +189,6 @@ public class RankFragment extends Fragment {
             holder.ordinal.setText(String.valueOf(position + 1));
             holder.name.setText(player.getUsername());
             holder.score.setText(String.format("%.2f", player.getPt()));
-            if (player.getPtTrendIndex() != null) {
-                holder.trend.setVisibility(View.VISIBLE);
-                if (player.getPtTrendIndex() > 5) {
-                    holder.trend.setText("↑");
-                    holder.trend.setTextColor(colorAccent);
-                } else if (player.getPtTrendIndex() < -5) {
-                    holder.trend.setText("↓");
-                    holder.trend.setTextColor(colorTextSecondary);
-                } else {
-                    holder.trend.setText("—");
-                    holder.trend.setTextColor(colorTextSecondary);
-                }
-            } else {
-                holder.trend.setVisibility(View.GONE);
-            }
         }
 
         @Override

@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="xjunz.tool.mycard.ui.WatchSetupActivity"
+            android:name="xjunz.tool.mycard.ui.LoginActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Base.Translucent"

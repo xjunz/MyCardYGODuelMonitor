@@ -3,9 +3,12 @@
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
+        <import type="android.text.Html" />
 
         <import type="xjunz.tool.mycard.App" />
     </data>
@@ -25,9 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?colorAccent"
-                android:clickable="true"
-                android:elevation="@dimen/z_item"
-                android:focusable="true">
+                android:elevation="@dimen/z_item">
 
                 <ImageView
                     android:id="@+id/iv_icon"
@@ -48,7 +49,7 @@
                     android:layout_marginBottom="16dp"
                     android:text="@string/app_name"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                    android:textColor="?android:textColorPrimaryInverse"
+                    android:textColor="@android:color/primary_text_dark"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -58,10 +59,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="4dp"
                     android:text="@{App.getVersionName()}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    android:textColor="?android:textColorSecondaryInverse"
+                    android:textColor="@android:color/primary_text_dark"
                     android:textStyle="italic"
                     app:layout_constraintBottom_toBottomOf="@+id/tv_app_name"
                     app:layout_constraintStart_toEndOf="@+id/tv_app_name" />
@@ -105,6 +106,7 @@
                     app:layout_constraintStart_toStartOf="parent" />
 
                 <Button
+                    style="@style/Widget.AppCompat.Button.Flat.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
@@ -219,7 +221,26 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/spacing_unit"
                 android:layout_marginStart="@dimen/spacing_normal"
-                android:text="@string/open_source_project_used"
+                android:text="@string/os_projects_used"
+                android:textColor="?colorAccent" />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_os"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?colorBackgroundFloating"
+                android:elevation="@dimen/z_item"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_os_project" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/spacing_unit"
+                android:layout_marginStart="@dimen/spacing_normal"
+                android:text="@string/credit_to"
                 android:textColor="?colorAccent" />
 
             <View
@@ -229,13 +250,17 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_os"
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
                 android:background="?colorBackgroundFloating"
                 android:elevation="@dimen/z_item"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                android:padding="@dimen/spacing_normal"
+                android:text="@string/mycard_n_ygomobile"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
         </LinearLayout>
+
+
     </androidx.core.widget.NestedScrollView>
 </layout>

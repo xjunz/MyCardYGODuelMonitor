@@ -3,6 +3,7 @@ plugins {
 }
 
 android {
+
     compileSdkVersion 30
     buildToolsVersion "29.0.3"
     buildFeatures {
@@ -13,17 +14,20 @@ android {
         applicationId "xjunz.tool.mycard"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 2
-        versionName "1.1"
+        versionCode 3
+        versionName "1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             multiDexEnabled true
+            signingConfig signingConfigs.xjunz
+        }
+        debug {
             signingConfig signingConfigs.xjunz
         }
     }
@@ -35,8 +39,8 @@ android {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    testImplementation 'junit:junit:4.+'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.0-alpha1'
+    testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'org.java-websocket:Java-WebSocket:1.5.1'

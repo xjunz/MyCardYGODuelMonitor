@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/colorAccent" android:state_enabled="true" />
+    <item android:color="@color/blind_teal_200" android:state_enabled="false" />
+</selector>

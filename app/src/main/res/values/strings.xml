@@ -18,17 +18,12 @@
     <string name="service_on">监测服务正在运行…</string>
     <string name="service_off">监测服务未运行</string>
     <string name="watch_list">观战列表</string>
-    <string name="def_username">此处为您的用户名</string>
-    <string name="def_token">此处为您的Token</string>
     <string name="hint_set_username">您的萌卡用户名</string>
-    <string name="hint_set_token">您的观战Token</string>
-    <string name="title_token_and_username">直接跳转观战需完成配置</string>
-    <string name="i_don_not_give_a_fuck">我才不管咧</string>
-    <string name="msg_reset_watch_config_in_settings">您可在设置中重新设置您的用户名和Token</string>
+    <string name="hint_pwd">您的密码</string>
+    <string name="logining">正在登录…</string>
+    <string name="title_login">请登录到萌卡平台</string>
     <string name="msg_input_uncompletely">请输入完整</string>
-    <string name="des_token_and_username">为了本应用能直接跳转到观战，请配置用户名和观战"Token"。用户名为您在YGO Mobile中登录的<b>萌卡账号的用户名</b>，
-        观战"Token"则是竞技房的房间密码中<b>"M#"之前</b>的部分，您可以进入任意观战并退出以进入下图页面查看(框中部分)。
-       </string>
+    <string name="des_login">为了本应用能直接跳转到观战，请先登录到萌卡平台确认您的身份以获取观战授权。</string>
     <string name="monitoring_focused_duels"><b>正在监测精彩对局…</b></string>
     <string name="settings">设置</string>
     <string name="watch_username">观战用户名</string>
@@ -53,8 +48,6 @@
     <string name="player_rank_larger_than">玩家%d的排名大于等于%d</string>
     <string name="player1_rank">玩家1排名</string>
     <string name="player2_rank">玩家2排名</string>
-    <string name="help_token_and_username">为了防止冒名，每个用户名对应唯一一个观战Token。服务端会检查您输入的用户名与Token是否匹配，如果不匹配，您将无法进入观战。</string>
-    <string name="token_illustration">TOKEN演示</string>
     <string name="token_over_length">Token长度为8位，请确认您的输入</string>
     <string name="hint_rank">0或空则不设限</string>
     <string name="stop_limit">上限</string>
@@ -86,7 +79,7 @@
     <string name="developer">开发者</string>
     <string name="check_update">检查更新</string>
     <string name="check_sourcecode">查看源代码</string>
-    <string name="open_source_project_used">使用的开源项目</string>
+    <string name="credit_to">特别鸣谢</string>
     <string name="donate">捐赠</string>
     <string name="feedback">反馈&amp;加入交流群</string>
     <string name="browser_chooser_title">请选择打开方式</string>
@@ -127,9 +120,25 @@
     <string name="descending">降序</string>
     <string name="apply">应用</string>
     <string name="whitelisted">已关注</string>
+    <string name="login">登录</string>
+    <string name="login_successfully">登录成功</string>
+    <string name="login_failed">账号或密码错误</string>
+    <string name="login_error">登录出错</string>
+    <string name="pls_wait_for">请%d秒后重试</string>
+    <string name="user">用户</string>
     <string-array name="sort_by">
         <item>按时间（默认）</item>
         <item>按DP排名（双方总和）</item>
         <item>按DP排名（双方中较低者）</item>
     </string-array>
+    <string name="not_login">未登录</string>
+    <string name="already_login">已登录</string>
+    <string name="tap_to_login">点击登录</string>
+    <string name="log_out">退出登录</string>
+    <string name="alert">提示</string>
+    <string name="alert_log_out">你确定要退出登录吗?</string>
+    <string name="os_projects_used">使用的开源项目</string>
+    <string name="mycard_n_ygomobile">萌卡官方(https://mycard.moe)、YGO Mobile</string>
+    <string name="logic">逻辑</string>
+    <string name="enable_or_not">是否启用</string>
 </resources>
