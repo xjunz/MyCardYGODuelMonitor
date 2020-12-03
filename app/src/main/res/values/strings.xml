@@ -152,7 +152,7 @@
     <string name="t_w_l_d">%d/%d/%d/%d</string>
     <string name="load">加载</string>
     <string name="add_to_whitelist">加入关注列表</string>
-    <string name="msg_whitelisted">已取消关注%s</string>
-    <string name="msg_un_whitelisted">已关注%s</string>
+    <string name="msg_whitelisted">已关注%s</string>
+    <string name="msg_un_whitelisted">已取消关注%s</string>
     <string name="duel_finished">对局已结束</string>
 </resources>
