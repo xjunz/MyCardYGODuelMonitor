@@ -35,12 +35,14 @@ public class MainActivity extends AppCompatActivity {
     private RankFragment mRankFragment;
     private ActivityMainBinding mBinding;
     private boolean mIsServiceBound;
+    private WatchService mService;
     private final ServiceConnection mConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             WatchService.WatchBinder binder = (WatchService.WatchBinder) service;
             binder.getService().setDuelCallback(mWatchFragment);
-            mBinding.setStatus(binder.getService().getServiceStatus());
+            mService = binder.getService();
+            mBinding.setStatus(mService.getServiceStatus());
             mIsServiceBound = true;
         }
 
@@ -48,6 +50,10 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceDisconnected(ComponentName name) {
         }
     };
+
+    public WatchService getWatchService() {
+        return mService;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

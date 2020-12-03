@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) xjunz 2020.
+  -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="host"
+            type="xjunz.tool.mycard.ui.fragment.DetailFragment" />
+
+        <variable
+            name="whitelisted"
+            type="androidx.databinding.ObservableInt" />
+
+        <variable
+            name="duel"
+            type="xjunz.tool.mycard.api.bean.Duel" />
+
+        <variable
+            name="p1"
+            type="xjunz.tool.mycard.api.bean.Player" />
+
+        <variable
+            name="p2"
+            type="xjunz.tool.mycard.api.bean.Player" />
+
+        <variable
+            name="finished"
+            type="androidx.databinding.ObservableBoolean" />
+
+    </data>
+
+    <ScrollView
+        style="@style/CustomVerticalScrollbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="@dimen/progress_width"
+                android:layout_height="wrap_content"
+                android:fade="@{duel.playerLoadState==duel.LOAD_STATE_LOADING}"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/ll_container"
+                app:layout_constraintEnd_toEndOf="@+id/ll_container"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/ll_container" />
+
+            <View
+                android:id="@+id/divider3"
+                android:layout_width="0dp"
+                android:layout_height="1px"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintBottom_toBottomOf="@+id/cl_top"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <View
+                android:id="@+id/divider5"
+                android:layout_width="0dp"
+                android:layout_height="1px"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ll_container" />
+
+            <Button
+                android:id="@+id/button"
+                style="@style/Widget.AppCompat.Button.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="@{duel.playerLoadState==duel.LOAD_STATE_FAILED}"
+                android:onClick="@{()->host.reload()}"
+                android:pop="@{duel.playerLoadState==duel.LOAD_STATE_FAILED}"
+                android:text="@string/retry"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/ll_container"
+                app:layout_constraintEnd_toEndOf="@+id/ll_container"
+                app:layout_constraintStart_toStartOf="@+id/ll_container"
+                app:layout_constraintTop_toTopOf="@+id/ll_container" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_top"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/spacing_normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/tv_name_1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@{duel.player1Name}"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/ib_add_to_wl_1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="@tools:sample/full_names" />
+
+                <TextView
+                    android:id="@+id/tv_name_2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@{duel.player2Name}"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/ib_add_to_wl_2"
+                    app:layout_constraintStart_toEndOf="@+id/id_vs"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="@tools:sample/full_names" />
+
+                <TextView
+                    android:id="@+id/id_vs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/vs"
+                    android:textStyle="bold|italic"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <ImageButton
+                    android:id="@+id/ib_add_to_wl_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_4"
+                    android:layout_marginEnd="@dimen/spacing_normal"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:onClick="@{()->host.addToOrRemoveFromWhitelist(1)}"
+                    android:src="@{whitelisted==1||whitelisted==3?@drawable/ic_baseline_playlist_add_check_24:@drawable/ic_baseline_playlist_add_24}"
+                    android:tooltip="@{whitelisted==1||whitelisted==3?@string/whitelisted:@string/add_to_whitelist}"
+                    app:layout_constraintBottom_toBottomOf="@+id/tv_name_1"
+                    app:layout_constraintEnd_toStartOf="@+id/id_vs"
+                    app:layout_constraintTop_toTopOf="@+id/tv_name_1"
+                    tools:ignore="ContentDescription" />
+
+                <ImageButton
+                    android:id="@+id/ib_add_to_wl_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_4"
+                    android:layout_marginEnd="@dimen/spacing_normal"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:onClick="@{()->host.addToOrRemoveFromWhitelist(2)}"
+                    android:src="@{whitelisted==2||whitelisted==3?@drawable/ic_baseline_playlist_add_check_24:@drawable/ic_baseline_playlist_add_24}"
+                    android:tooltip="@{whitelisted==2||whitelisted==3?@string/whitelisted:@string/add_to_whitelist}"
+                    app:layout_constraintBottom_toBottomOf="@+id/tv_name_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/tv_name_2"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Space
+                android:id="@+id/space"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/ll_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:fade="@{duel.playerLoadState==duel.LOAD_STATE_SUCCESS}"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cl_top">
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dp_rank"
+                        android:textColor="?colorAccent" />
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@{String.valueOf(p1.arenaRank)}"
+                        tools:text="118" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/dp_value"
+                        android:textColor="?colorAccent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@{p1.formattedPt}"
+                        tools:text="1148.78" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/win_rate"
+                        android:textColor="?colorAccent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@{p1.formattedWinRatio}"
+                        tools:text="68.52%" />
+
+                    <TextView
+                        android:id="@+id/ts1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/total_win_lose_draw"
+                        android:textColor="?colorAccent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@{@string/t_w_l_d(p1.athleticAll,p1.athleticWin,p1.athleticLose,p1.athleticDraw)}"
+                        tools:text="99/67/32/0" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dp_rank"
+                        android:textColor="?colorAccent" />
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@{String.valueOf(p2.arenaRank)}"
+                        tools:text="118" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/dp_value"
+                        android:textColor="?colorAccent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@{p2.formattedPt}"
+                        tools:text="1148.78" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/win_rate"
+                        android:textColor="?colorAccent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@{p2.formattedWinRatio}"
+                        tools:text="68.52%" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/total_win_lose_draw"
+                        android:textColor="?colorAccent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@{@string/t_w_l_d(p2.athleticAll,p2.athleticWin,p2.athleticLose,p2.athleticDraw)}"
+                        tools:text="99/67/32/0" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_watch"
+                style="@style/Widget.AppCompat.Button.Small"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:drawableStart="@drawable/ic_baseline_eye_20"
+                android:drawableTint="@color/white"
+                android:enabled="@{!finished}"
+                android:onClick="@{()->host.launchWatch()}"
+                android:text="@{finished?@string/duel_finished:@string/watch}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider5" />
+
+            <Button
+                android:id="@+id/button2"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:onClick="@{()->host.dismiss()}"
+                android:text="@android:string/cancel"
+                app:layout_constraintBottom_toBottomOf="@+id/btn_watch"
+                app:layout_constraintEnd_toStartOf="@+id/btn_watch"
+                app:layout_constraintTop_toTopOf="@+id/btn_watch" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>

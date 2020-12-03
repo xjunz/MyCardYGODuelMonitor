@@ -46,8 +46,6 @@ import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Response;
 import xjunz.tool.mycard.api.Constants;
 import xjunz.tool.mycard.api.LoadPlayerInfoService;
 import xjunz.tool.mycard.api.bean.Duel;
@@ -85,9 +83,9 @@ public class WatchService extends Service {
                 for (int i = 0; i < Math.min(mDuels.size(), 5); i++) {
                     long cur = System.currentTimeMillis();
                     Duel duel = mDuels.get(i);
-                    if (duel.getStartTimestamp() != 0 && cur - duel.getStartTimestamp() >= 15 * 60 * 1000) {
-                        if (duel.getPlayer1Rank() != 0 && duel.getPlayer1Rank() <= 1500) {
-                            if (duel.getPlayer2Rank() != 0 && duel.getPlayer2Rank() <= 1500) {
+                    if (duel.getStartTimestamp() != 0 && cur - duel.getStartTimestamp() >= 20 * 60 * 1000) {
+                        if (duel.getPlayer1Rank() != 0 && duel.getPlayer1Rank() <= 2000) {
+                            if (duel.getPlayer2Rank() != 0 && duel.getPlayer2Rank() <= 2000) {
                                 int curRankSum = duel.getPlayer1Rank() + duel.getPlayer2Rank();
                                 if (curRankSum <= minRankSum) {
                                     minRankSum = curRankSum;
@@ -108,6 +106,7 @@ public class WatchService extends Service {
     private Timer mWhiteHotTimer;
     private Disposable mOnMessageDisposable;
     private int mOrdinalOfAllDuels;
+    private LoadPlayerInfoService mLoadPlayerInfoService;
 
     @NonNull
 
@@ -132,6 +131,7 @@ public class WatchService extends Service {
         super.onCreate();
         mNotifiedDuels = new HashMap<>();
         mCountDownTimers = new ArrayList<>();
+        mLoadPlayerInfoService = Utils.createRetrofit(App.config().duelRankLoadTimeout.getValue()).create(LoadPlayerInfoService.class);
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             FOREGROUND_CHANNEL_ID = getPackageName() + ":foreground";
@@ -299,6 +299,82 @@ public class WatchService extends Service {
         this.mDuelCallback = duelCallback;
     }
 
+    private void loadPlayer1Info(@NonNull Duel duel, boolean shouldNotify, int time) {
+        mLoadPlayerInfoService.loadPlayerInfo(duel.getPlayer1Name()).enqueue(new Utils.CallbackAdapter<Player>() {
+            @Override
+            public void onSuccess(Player player) {
+                duel.setPlayer1(player);
+                notifyWhenLoadComplete(duel, shouldNotify);
+            }
+
+            @Override
+            public void onNull(Throwable t) {
+                if (time > 0 && !duel.isLoadFailed()) {
+                    //重试
+                    loadPlayer1Info(duel, shouldNotify, time - 1);
+                } else {
+                    duel.playerLoadState.set(Duel.LOAD_STATE_FAILED);
+                    if (mDuelCallback != null) {
+                        mDuelCallback.onPlayerInfoLoadFailed(duel);
+                    }
+                }
+            }
+        });
+    }
+
+    private void loadPlayer2Info(@NonNull Duel duel, boolean shouldNotify, int time) {
+        mLoadPlayerInfoService.loadPlayerInfo(duel.getPlayer2Name()).enqueue(new Utils.CallbackAdapter<Player>() {
+            @Override
+            public void onSuccess(Player player) {
+                duel.setPlayer2(player);
+                notifyWhenLoadComplete(duel, shouldNotify);
+            }
+
+            @Override
+            public void onNull(Throwable t) {
+                if (time > 0 && !duel.isLoadFailed()) {
+                    //重试
+                    loadPlayer2Info(duel, shouldNotify, time - 1);
+                } else {
+                    duel.playerLoadState.set(Duel.LOAD_STATE_FAILED);
+                    if (mDuelCallback != null) {
+                        mDuelCallback.onPlayerInfoLoadFailed(duel);
+                    }
+                }
+            }
+        });
+    }
+
+    private void notifyWhenLoadComplete(@NonNull Duel duel, boolean shouldNotify) {
+        if (duel.getPlayer1() != null && duel.getPlayer2() != null) {
+            duel.playerLoadState.set(Duel.LOAD_STATE_SUCCESS);
+            if (mDuelCallback != null) {
+                mDuelCallback.onPlayerInfoGot(duel);
+            }
+            if (shouldNotify) {
+                //只推非白名单对局
+                //因为白名单对局在onMessage里已经推过了
+                if (App.config().isDuelInPushCondition(duel) && App.config().isWhitelisted(duel) <= 0) {
+                    int delay = App.config().pushDelayMin.getValue();
+                    if (delay > 0) {
+                        beginDelayPush(delay, duel);
+                    } else {
+                        Notification notification = buildWatchNotification(getString(R.string.def_notification_title)
+                                , buildNotificationContent(duel), duel);
+                        notifyDuel(duel, notification);
+                    }
+                }
+            }
+        }
+    }
+
+    public void loadPlayerRank(@NonNull Duel duel, boolean shouldNotify) {
+        duel.playerLoadState.set(Duel.LOAD_STATE_LOADING);
+        loadPlayer1Info(duel, shouldNotify, App.config().duelRankLoadRetryTimes.getValue());
+        loadPlayer2Info(duel, shouldNotify, App.config().duelRankLoadRetryTimes.getValue());
+    }
+
+
     public interface DuelCallback {
         void onInitList(List<Duel> initialDuels);
 
@@ -306,18 +382,19 @@ public class WatchService extends Service {
 
         void onDuelDeleted(String id);
 
-        void onPlayerRankGot(Duel duel);
+        void onPlayerInfoGot(Duel duel);
+
+        void onPlayerInfoLoadFailed(Duel duel);
     }
 
     private class MyCardWssClient extends WebSocketClient {
         private static final String EVENT_INIT = "init";
         private static final String EVENT_DELETE = "delete";
         private static final String EVENT_CREATE = "create";
-        private final LoadPlayerInfoService mLoadPlayerInfoService;
+
 
         public MyCardWssClient(URI serverUri) {
             super(serverUri);
-            mLoadPlayerInfoService = Utils.createRetrofit(App.config().duelRankLoadTimeout.getValue()).create(LoadPlayerInfoService.class);
         }
 
         @Override
@@ -334,71 +411,6 @@ public class WatchService extends Service {
             mServiceStatus.set(STATUS_OPENED);
         }
 
-        private void loadPlayer1Rank(@NonNull Duel duel, boolean shouldNotify, int time) {
-            mLoadPlayerInfoService.loadPlayerInfo(duel.getPlayer1Name()).enqueue(new Utils.CallbackAdapter<Player>() {
-                @Override
-                public void onResponse(@NonNull Call<Player> call, @NonNull Response<Player> response) {
-                    duel.setPlayer1(response.body());
-                    notifyWhenLoadComplete(duel, shouldNotify);
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<Player> call, @NonNull Throwable t) {
-                    super.onFailure(call, t);
-                    if (time > 0) {
-                        //重试
-                        loadPlayer1Rank(duel, shouldNotify, time - 1);
-                    }
-                }
-            });
-        }
-
-        private void loadPlayer2Rank(@NonNull Duel duel, boolean shouldNotify, int time) {
-            mLoadPlayerInfoService.loadPlayerInfo(duel.getPlayer2Name()).enqueue(new Utils.CallbackAdapter<Player>() {
-                @Override
-                public void onResponse(@NonNull Call<Player> call, @NonNull Response<Player> response) {
-                    duel.setPlayer2(response.body());
-                    notifyWhenLoadComplete(duel, shouldNotify);
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<Player> call, @NonNull Throwable t) {
-                    super.onFailure(call, t);
-                    if (time > 0) {
-                        //重试
-                        loadPlayer1Rank(duel, shouldNotify, time - 1);
-                    }
-                }
-            });
-        }
-
-        private void notifyWhenLoadComplete(@NonNull Duel duel, boolean shouldNotify) {
-            if (duel.getPlayer1() != null && duel.getPlayer2() != null) {
-                if (mDuelCallback != null) {
-                    mDuelCallback.onPlayerRankGot(duel);
-                }
-                if (shouldNotify) {
-                    //只推非白名单对局
-                    //因为白名单对局在onMessage里已经推过了
-                    if (App.config().isDuelInPushCondition(duel) && App.config().isWhitelisted(duel) <= 0) {
-                        int delay = App.config().pushDelayMin.getValue();
-                        if (delay > 0) {
-                            beginDelayPush(delay, duel);
-                        } else {
-                            Notification notification = buildWatchNotification(getString(R.string.def_notification_title)
-                                    , buildNotificationContent(duel), duel);
-                            notifyDuel(duel, notification);
-                        }
-                    }
-                }
-            }
-        }
-
-
-        private void loadPlayerRank(@NonNull Duel duel, boolean shouldNotify) {
-            loadPlayer1Rank(duel, shouldNotify, App.config().duelRankLoadRetryTimes.getValue());
-            loadPlayer2Rank(duel, shouldNotify, App.config().duelRankLoadRetryTimes.getValue());
-        }
 
         @Override
         public void onMessage(String message) {

@@ -38,6 +38,7 @@ public class Settings {
     public BooleanSetting reconnectWhenClosedRemotely = new BooleanSetting("reconnect_when_closed_remotely", false);
     public BooleanSetting enableWhitelist = new BooleanSetting("enable_whitelist", true);
     public StringSetSetting pushWhiteList = new StringSetSetting("push_whitelist", null);
+    public BooleanSetting highlightPro = new BooleanSetting("highlight_pro", false);
     public ObservableInt watchListSortBy = new ObservableInt(0);
     public ObservableBoolean watchListAscending = new ObservableBoolean(true);
     private final ObservableField<String> conditionText = new ObservableField<>(player1RankLimit, player2RankLimit, isConditionAnd);
@@ -65,7 +66,17 @@ public class Settings {
         if (App.config().enableWhitelist.getValue()) {
             Set<String> whiteSet = App.config().pushWhiteList.getValue();
             if (whiteSet != null) {
-                return whiteSet.contains(duel.getPlayer1Name()) ? 1 : whiteSet.contains(duel.getPlayer2Name()) ? 2 : 0;
+                boolean whitelistedPlayer1 = whiteSet.contains(duel.getPlayer1Name());
+                boolean whitelistedPlayer2 = whiteSet.contains(duel.getPlayer2Name());
+                if (whitelistedPlayer1 && whitelistedPlayer2) {
+                    return 3;
+                } else if (whitelistedPlayer1) {
+                    return 1;
+                } else if (whitelistedPlayer2) {
+                    return 2;
+                } else {
+                    return 0;
+                }
             }
         }
         return 0;

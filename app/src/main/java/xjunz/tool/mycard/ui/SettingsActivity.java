@@ -76,11 +76,6 @@ public class SettingsActivity extends AppCompatActivity {
                 editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
                 editText.setInputType(InputType.TYPE_CLASS_NUMBER);
             }
-
-            @Override
-            public String getIllegalInputToastText() {
-                return getString(R.string.token_over_length);
-            }
         }).setTitle(getString(R.string.push_minutes_after_duel))
                 .setCaption(getText(R.string.caption_push))
                 .show(getSupportFragmentManager(), "push_delay");

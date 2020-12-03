@@ -31,7 +31,7 @@
         <activity
             android:name="xjunz.tool.mycard.ui.LoginActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Base.Translucent"
             android:windowSoftInputMode="adjustUnspecified" />
         <activity

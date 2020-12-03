@@ -13,13 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import xjunz.tool.mycard.api.CheckUpdateService;
 import xjunz.tool.mycard.api.Constants;
 import xjunz.tool.mycard.api.bean.UpdateInfo;
+import xjunz.tool.mycard.util.CrashHandler;
 import xjunz.tool.mycard.util.TokenGenerator;
 import xjunz.tool.mycard.util.Utils;
 
@@ -68,6 +67,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
         sSettings = new Settings(getApplicationContext().getSharedPreferences("config", MODE_PRIVATE));
         sApplicationContext = getApplicationContext();
         try {
@@ -94,13 +94,9 @@ public class App extends Application {
                 .build().create(CheckUpdateService.class);
         checkUpdateService.checkUpdate(Constants.CHECK_UPDATE_FIR_API_TOKEN).enqueue(new Utils.CallbackAdapter<UpdateInfo>() {
             @Override
-            public void onResponse(@NonNull Call<UpdateInfo> call, @NonNull Response<UpdateInfo> response) {
-                super.onResponse(call, response);
-                UpdateInfo info = response.body();
-                if (info != null) {
-                    if (sVersionCode < info.getBuild()) {
-                        sHasUpdate = true;
-                    }
+            public void onSuccess(UpdateInfo updateInfo) {
+                if (sVersionCode < updateInfo.getBuild()) {
+                    sHasUpdate = true;
                 }
             }
         });

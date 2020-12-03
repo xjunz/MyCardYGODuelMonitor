@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2020 xjunz. 保留所有权利
+  ~ Copyright (c) xjunz 2020.
   -->
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
     android:inset="@dimen/spacing_unit">
@@ -9,8 +9,8 @@
                 <corners android:radius="@dimen/corner_button" />
                 <solid android:color="?colorButtonNormal" />
                 <padding
-                    android:left="4dp"
-                    android:right="4dp" />
+                    android:left="8dp"
+                    android:right="8dp" />
             </shape>
         </item>
     </ripple>

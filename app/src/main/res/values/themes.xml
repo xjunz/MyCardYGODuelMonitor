@@ -55,6 +55,7 @@
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowMinWidthMinor">80%</item>
+        <item name="android:windowMinWidthMajor">75%</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.25</item>
     </style>
@@ -70,14 +71,22 @@
         <item name="android:scrollbars">vertical</item>
         <item name="android:scrollbarThumbVertical">@drawable/bg_scrollbar_thumb</item>
     </style>
+
     <!-- flat button style -->
     <style name="Widget.AppCompat.Button.Flat">
+
+    </style>
+
+    <!-- flat button style -->
+    <style name="Widget.AppCompat.Button.Small">
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:stateListAnimator">@animator/flat_raise</item>
+        <item name="android:background">@drawable/bg_btn_small</item>
     </style>
 
     <!-- flat small-sized button style (such as positive dialog button) -->
     <style name="Widget.AppCompat.Button.Flat.Small">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:stateListAnimator">@animator/flat_raise</item>
         <item name="android:background">@drawable/bg_btn_small</item>
     </style>
 

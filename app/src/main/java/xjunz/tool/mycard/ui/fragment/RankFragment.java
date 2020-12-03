@@ -71,22 +71,19 @@ public class RankFragment extends Fragment {
         mLoading.set(true);
         mLoadListCall.enqueue(new Utils.CallbackAdapter<List<Player>>() {
             @Override
-            public void onResponse(@NonNull Call<List<Player>> call, @NonNull Response<List<Player>> response) {
-                super.onResponse(call, response);
-                mRankList = response.body();
-                if (mRankList != null) {
-                    mAdapter = new RankAdapter();
-                    mBinding.rvRank.setAdapter(mAdapter);
-                    for (Player player : mRankList) {
-                        loadDecksOf(player);
-                    }
+            public void onSuccess(List<Player> players) {
+                super.onSuccess(players);
+                mRankList = players;
+                mAdapter = new RankAdapter();
+                mBinding.rvRank.setAdapter(mAdapter);
+                for (Player player : mRankList) {
+                    loadTrendOf(player);
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<Player>> call, @NonNull Throwable t) {
-                super.onFailure(call, t);
-                MasterToast.shortToast(getString(R.string.load_failed, t.getMessage()));
+            public void onNull(@NonNull Throwable t) {
+                MasterToast.shortToast(getString(R.string.msg_load_failed, t.getMessage()));
             }
 
             @Override
@@ -108,7 +105,7 @@ public class RankFragment extends Fragment {
         }
     }
 
-    private void loadDecksOf(@NonNull Player player) {
+    private void loadTrendOf(@NonNull Player player) {
         String playerName = player.getUsername();
         if (mLoadHistoryService == null) {
             mLoadHistoryService = Utils.createRetrofit().create(LoadHistoryService.class);
@@ -127,12 +124,6 @@ public class RankFragment extends Fragment {
                 if (index >= 0) {
                     mAdapter.notifyItemChanged(index, true);
                 }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<HistorySet> call, @NonNull Throwable t) {
-                super.onFailure(call, t);
-                t.printStackTrace();
             }
 
             @Override
@@ -186,9 +177,25 @@ public class RankFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull final PlayerViewHolder holder, int position) {
             Player player = mRankList.get(position);
+            holder.tags.setText(getString(R.string.win_rate_separator, player.getFormattedWinRatio()));
             holder.ordinal.setText(String.valueOf(position + 1));
             holder.name.setText(player.getUsername());
             holder.score.setText(String.format("%.2f", player.getPt()));
+            if (player.getPtTrendIndex() != null) {
+                holder.trend.setVisibility(View.VISIBLE);
+                if (player.getPtTrendIndex() > 5) {
+                    holder.trend.setText("↑");
+                    holder.trend.setTextColor(colorAccent);
+                } else if (player.getPtTrendIndex() < -5) {
+                    holder.trend.setText("↓");
+                    holder.trend.setTextColor(colorTextSecondary);
+                } else {
+                    holder.trend.setText("—");
+                    holder.trend.setTextColor(colorTextSecondary);
+                }
+            } else {
+                holder.trend.setVisibility(View.GONE);
+            }
         }
 
         @Override
@@ -197,7 +204,7 @@ public class RankFragment extends Fragment {
         }
     }
 
-    private static class PlayerViewHolder extends RecyclerView.ViewHolder {
+    private class PlayerViewHolder extends RecyclerView.ViewHolder {
         TextView name, ordinal, tags, score, trend;
 
         public PlayerViewHolder(@NonNull View itemView) {
@@ -207,6 +214,7 @@ public class RankFragment extends Fragment {
             tags = itemView.findViewById(R.id.tv_tags);
             score = itemView.findViewById(R.id.tv_score);
             trend = itemView.findViewById(R.id.tv_trend);
+            itemView.setOnClickListener(v -> Utils.viewURL(requireActivity(), "https://mycard.moe/ygopro/arena/#/userinfo?username=" + mRankList.get(getAdapterPosition()).getUsername()));
         }
     }
 }

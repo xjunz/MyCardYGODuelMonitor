@@ -5,13 +5,13 @@
 
 package xjunz.tool.mycard.api.bean;
 
+import android.annotation.SuppressLint;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 
@@ -55,7 +55,7 @@ public class Player {
     private Double mEarliestPt;
     private HistorySet mHistorySet;
 
-    private List<FrequencyDeck> mDecks;
+
 
     public void setHistorySet(HistorySet set) {
         this.mHistorySet = set;
@@ -74,12 +74,7 @@ public class Player {
         return mHistorySet;
     }
 
-    public List<FrequencyDeck> getUsedDecks() {
-        return mDecks;
-    }
-
     private void readPtTrend(@NonNull HistorySet set) {
-        mDecks = new ArrayList<>();
         int size = set.getData().size();
         for (int i = 0; i < size; i++) {
             History history = set.getData().get(i);
@@ -185,6 +180,9 @@ public class Player {
         return mPt;
     }
 
+    private String formattedPt;
+    private String formattedAthleticWinRatio;
+
     public void setPt(Double pt) {
         mPt = pt;
     }
@@ -219,6 +217,25 @@ public class Player {
 
     public void setEntertainWlRatio(Double entertainWlRatio) {
         mEntertainWlRatio = entertainWlRatio;
+    }
+
+    @SuppressLint("DefaultLocale")
+    public String getFormattedPt() {
+        if (formattedPt == null) {
+            formattedPt = String.format("%.2f", getPt());
+        }
+        return formattedPt;
+    }
+
+    @SuppressLint("DefaultLocale")
+    public String getFormattedWinRatio() {
+        if (formattedAthleticWinRatio == null) {
+            if (mAthleticWlRatio == null) {
+                mAthleticWlRatio = 100 * ((double) mAthleticWin / (double) mAthleticAll);
+            }
+            formattedAthleticWinRatio = String.format("%.2f%%", mAthleticWlRatio);
+        }
+        return formattedAthleticWinRatio;
     }
 
     public Double getAthleticWlRatio() {

@@ -4,7 +4,6 @@
 
 package xjunz.tool.mycard.ui.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,8 +30,6 @@ import xjunz.tool.mycard.R;
 import xjunz.tool.mycard.WatchService;
 import xjunz.tool.mycard.api.bean.Duel;
 import xjunz.tool.mycard.databinding.ItemDuelBinding;
-import xjunz.tool.mycard.ui.LoginActivity;
-import xjunz.tool.mycard.ui.MasterToast;
 import xjunz.tool.mycard.util.Utils;
 
 public class WatchFragment extends Fragment implements WatchService.DuelCallback {
@@ -50,6 +46,7 @@ public class WatchFragment extends Fragment implements WatchService.DuelCallback
     };
     private ProgressBar mProgress;
     private List<Duel> mOldDuels;
+    private DetailFragment mCurDetail;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +58,7 @@ public class WatchFragment extends Fragment implements WatchService.DuelCallback
         App.config().player2RankLimit.addOnPropertyChangedCallback(mSettingsChangeCallback);
         App.config().isConditionAnd.addOnPropertyChangedCallback(mSettingsChangeCallback);
         App.config().enableConditionedPush.addOnPropertyChangedCallback(mSettingsChangeCallback);
+        App.config().highlightPro.addOnPropertyChangedCallback(mSettingsChangeCallback);
         setRetainInstance(true);
     }
 
@@ -123,6 +121,11 @@ public class WatchFragment extends Fragment implements WatchService.DuelCallback
     @Override
     public void onDuelDeleted(String id) {
         if (mDuelAdapter != null) {
+            if (mCurDetail != null && mCurDetail.isAdded()) {
+                if (mCurDetail.getDuel().getId().equals(id)) {
+                    mCurDetail.notifyDuelFinished();
+                }
+            }
             for (int i = 0; i < mDuels.size(); i++) {
                 if (mDuels.get(i).getId().equals(id)) {
                     mDuels.remove(i);
@@ -134,7 +137,7 @@ public class WatchFragment extends Fragment implements WatchService.DuelCallback
     }
 
     @Override
-    public void onPlayerRankGot(Duel duel) {
+    public void onPlayerInfoGot(Duel duel) {
         if (mDuelAdapter != null) {
             if (App.config().watchListSortBy.get() == 0) {
                 int index = mDuels.indexOf(duel);
@@ -169,16 +172,25 @@ public class WatchFragment extends Fragment implements WatchService.DuelCallback
         }
     }
 
+    @Override
+    public void onPlayerInfoLoadFailed(Duel duel) {
+        int index = mDuels.indexOf(duel);
+        if (index >= 0) {
+            mDuelAdapter.notifyItemChanged(index);
+        }
+    }
+
 
     private class DuelAdapter extends RecyclerView.Adapter<PlayerViewHolder> {
-        private final int accentColor;
-        private final int whitelistedColor;
-        private final int textColor;
+
+        private final int colorHighlight;
+        private final int colorText;
+        private final int colorFocusedHighlight;
 
         private DuelAdapter() {
-            accentColor = Utils.getAttrColor(requireContext(), R.attr.colorAccent);
-            textColor = Utils.getAttrColor(requireContext(), android.R.attr.textColorPrimary);
-            whitelistedColor = getResources().getColor(R.color.colorWhitelisted, getContext().getTheme());
+            colorHighlight = Utils.getAttrColor(requireContext(), R.attr.colorAccent);
+            colorText = Utils.getAttrColor(requireContext(), android.R.attr.textColorPrimary);
+            colorFocusedHighlight = getResources().getColor(R.color.red_200, requireActivity().getTheme());
         }
 
         @NonNull
@@ -192,9 +204,42 @@ public class WatchFragment extends Fragment implements WatchService.DuelCallback
             Duel duel = mDuels.get(position);
             int whitelisted = App.config().isWhitelisted(duel);
             holder.binding.setDuel(duel);
-            holder.binding.setFocused(App.config().isDuelInPushCondition(duel));
             holder.binding.setWhitelisted(whitelisted);
+            holder.binding.setFocused(App.config().isDuelInPushCondition(duel));
             holder.binding.executePendingBindings();
+            if (duel.isLoadFailed()) {
+                holder.binding.tvRank1.setText(R.string.load_failed);
+                holder.binding.tvRank2.setText(R.string.load_failed);
+            } else if (duel.isLoading()) {
+                holder.binding.tvRank1.setText(R.string.loading);
+                holder.binding.tvRank2.setText(R.string.loading);
+            } else {
+                holder.binding.tvRank1.setText(String.valueOf(duel.getPlayer1Rank()));
+                holder.binding.tvRank2.setText(String.valueOf(duel.getPlayer2Rank()));
+            }
+            if (App.config().highlightPro.getValue()) {
+                if (duel.isPlayer1Pro()) {
+                    if (whitelisted != 0) {
+                        holder.binding.tvPlayer1.setTextColor(colorFocusedHighlight);
+                    } else {
+                        holder.binding.tvPlayer1.setTextColor(colorHighlight);
+                    }
+                } else {
+                    holder.binding.tvPlayer1.setTextColor(colorText);
+                }
+                if (duel.isPlayer2Pro()) {
+                    if (whitelisted != 0) {
+                        holder.binding.tvPlayer2.setTextColor(colorFocusedHighlight);
+                    } else {
+                        holder.binding.tvPlayer2.setTextColor(colorHighlight);
+                    }
+                } else {
+                    holder.binding.tvPlayer2.setTextColor(colorText);
+                }
+            } else {
+                holder.binding.tvPlayer1.setTextColor(colorText);
+                holder.binding.tvPlayer2.setTextColor(colorText);
+            }
         }
 
         @Override
@@ -205,31 +250,13 @@ public class WatchFragment extends Fragment implements WatchService.DuelCallback
 
     private class PlayerViewHolder extends RecyclerView.ViewHolder {
         ItemDuelBinding binding;
-        TextView rank1, rank2, name1, name2;
 
-        public PlayerViewHolder(ItemDuelBinding binding) {
+        public PlayerViewHolder(@NonNull ItemDuelBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-        }
-
-        public PlayerViewHolder(@NonNull View itemView) {
-            super(itemView);
-            rank1 = itemView.findViewById(R.id.tv_rank_1);
-            rank2 = itemView.findViewById(R.id.tv_rank_2);
-            name1 = itemView.findViewById(R.id.tv_player_1);
-            name2 = itemView.findViewById(R.id.tv_player_2);
             itemView.setOnClickListener(v -> {
-                if (!App.isYGOMobileInstalled()) {
-                    MasterToast.shortToast(R.string.ygo_mobile_not_installed);
-                    return;
-                }
-                if (App.config().hasLoggedIn()) {
-                    Utils.launchWatch(requireContext(), mDuels.get(getAdapterPosition()).getId());
-                } else {
-                    Intent intent = new Intent(requireActivity(), LoginActivity.class);
-                    intent.putExtra(LoginActivity.EXTRA_DUEL_ID, mDuels.get(getAdapterPosition()).getId());
-                    startActivity(intent);
-                }
+                mCurDetail = new DetailFragment().setDuel(mDuels.get(getAdapterPosition()));
+                mCurDetail.show(requireFragmentManager(), "detail");
             });
         }
     }

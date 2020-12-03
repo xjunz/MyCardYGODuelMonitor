@@ -6,6 +6,7 @@ package xjunz.tool.mycard.api.bean;
 
 import androidx.annotation.IntRange;
 import androidx.annotation.Nullable;
+import androidx.databinding.ObservableInt;
 
 import java.util.Objects;
 
@@ -23,6 +24,22 @@ public class Duel implements Comparable<Duel> {
     public static final int SORT_BY_RANK_SUM = 1;
     public static final int SORT_BY_RANK_MINOR = 2;
     private int ordinal;
+    public static final int LOAD_STATE_FAILED = -1;
+    public static final int LOAD_STATE_LOADING = 0;
+    public static final int LOAD_STATE_SUCCESS = 1;
+    public ObservableInt playerLoadState = new ObservableInt(0);
+
+    public boolean isLoadFailed() {
+        return playerLoadState.get() == LOAD_STATE_FAILED;
+    }
+
+    public boolean isLoading() {
+        return playerLoadState.get() == LOAD_STATE_LOADING;
+    }
+
+    public boolean isSuccess() {
+        return playerLoadState.get() == LOAD_STATE_SUCCESS;
+    }
 
     public String getPlayer1Name() {
         return player1Name;

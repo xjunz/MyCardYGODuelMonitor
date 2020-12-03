@@ -11,5 +11,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="colorToast">#A0000000</color>
     <color name="colorMask">#30000000</color>
-    <color name="colorWhitelisted">#30FF3D00</color>
+    <color name="semi_red_200">#30FF3D00</color>
+    <color name="red_200">#FFFF3D00</color>
 </resources>

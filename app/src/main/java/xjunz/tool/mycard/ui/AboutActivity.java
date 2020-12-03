@@ -25,8 +25,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.Objects;
 
 import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import xjunz.tool.mycard.App;
@@ -36,6 +34,8 @@ import xjunz.tool.mycard.api.Constants;
 import xjunz.tool.mycard.api.bean.UpdateInfo;
 import xjunz.tool.mycard.databinding.ActivityAboutBinding;
 import xjunz.tool.mycard.util.Utils;
+
+import static xjunz.tool.mycard.util.Utils.viewURL;
 
 public class AboutActivity extends AppCompatActivity {
     private ActivityAboutBinding mBinding;
@@ -57,11 +57,6 @@ public class AboutActivity extends AppCompatActivity {
                 .build().create(CheckUpdateService.class);
     }
 
-    private void viewURL(String url) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        startActivity(Intent.createChooser(intent, getString(R.string.browser_chooser_title)));
-    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -89,27 +84,22 @@ public class AboutActivity extends AppCompatActivity {
         mLastCheckTimestamp = System.currentTimeMillis();
         mCheckUpdateService.checkUpdate(Constants.CHECK_UPDATE_FIR_API_TOKEN).enqueue(new Utils.CallbackAdapter<UpdateInfo>() {
             @Override
-            public void onResponse(@NonNull Call<UpdateInfo> call, @NonNull Response<UpdateInfo> response) {
-                super.onResponse(call, response);
+            public void onSuccess(UpdateInfo updateInfo) {
+                super.onSuccess(updateInfo);
                 if (AboutActivity.this.isDestroyed()) {
                     return;
                 }
-                UpdateInfo info = response.body();
-                if (info == null) {
-                    MasterToast.shortToast(R.string.check_update_failed);
-                    return;
-                }
-                if (App.getVersionCode() < info.getBuild()) {
+                if (App.getVersionCode() < updateInfo.getBuild()) {
                     mBinding.updateBadge.setVisibility(View.VISIBLE);
                     App.setHasUpdate(true);
                     new AlertDialog.Builder(AboutActivity.this)
                             .setTitle(R.string.new_version_available)
                             .setMessage(getString(R.string.new_version_msg,
-                                    info.getVersionShort(),
-                                    info.getChangelog(),
-                                    Formatter.formatFileSize(AboutActivity.this, info.getBinary().getFsize())))
+                                    updateInfo.getVersionShort(),
+                                    updateInfo.getChangelog(),
+                                    Formatter.formatFileSize(AboutActivity.this, updateInfo.getBinary().getFsize())))
                             .setPositiveButton(getString(R.string.download), (dialog, which) -> {
-                                viewURL(info.getInstallUrl());
+                                viewURL(AboutActivity.this, updateInfo.getInstallUrl());
                                 MasterToast.shortToast(R.string.what_if_download_fail);
                             }).setNegativeButton(android.R.string.cancel, null).show();
                 } else {
@@ -118,20 +108,15 @@ public class AboutActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<UpdateInfo> call, @NonNull Throwable t) {
-                super.onFailure(call, t);
+            public void onNull(Throwable reason) {
                 MasterToast.shortToast(R.string.check_update_failed);
-            }
-
-            @Override
-            public void onWhatever() {
             }
         });
 
     }
 
     public void viewSource(View view) {
-        viewURL("https://github.com/xjunz/MyCardYGODuelMonitor");
+        viewURL(this, "https://github.com/xjunz/MyCardYGODuelMonitor");
     }
 
     private static final String QQ_GROUP_NUM = "684446998";
@@ -184,7 +169,7 @@ public class AboutActivity extends AppCompatActivity {
             super(itemView);
             name = itemView.findViewById(R.id.tv_name);
             license = itemView.findViewById(R.id.tv_license);
-            itemView.setOnClickListener(v -> viewURL(OS_PROJECTS_URL[getAdapterPosition()]));
+            itemView.setOnClickListener(v -> viewURL(AboutActivity.this, OS_PROJECTS_URL[getAdapterPosition()]));
         }
     }
 }

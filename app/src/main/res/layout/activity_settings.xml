@@ -312,6 +312,47 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/spacing_unit"
                 android:layout_marginStart="@dimen/spacing_normal"
+                android:text="@string/ui"
+                android:textColor="?colorAccent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_selectable"
+                android:clickable="true"
+                android:elevation="@dimen/z_item"
+                android:focusable="true"
+                android:onClick="@{()->switchHighlightPro.performClick()}">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_normal"
+                    android:layout_marginTop="@dimen/spacing_normal"
+                    android:layout_marginBottom="@dimen/spacing_normal"
+                    android:text="@string/highlight_pro_players"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Switch
+                    android:id="@+id/switch_highlight_pro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/spacing_normal"
+                    android:checked="@={settings.highlightPro.value}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/spacing_unit"
+                android:layout_marginStart="@dimen/spacing_normal"
                 android:text="@string/network"
                 android:textColor="?colorAccent" />
 
